@@ -1,0 +1,774 @@
+*&---------------------------------------------------------------------*
+*& Report ZTIM_TEST28
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ztim_test28.
+
+TYPE-POOLS: slis.
+
+TABLES: acdoca, mara.
+
+DATA: BEGIN OF gt_acdoca OCCURS 0,
+    fiscyearper TYPE acdoca-fiscyearper,
+    rbusa TYPE acdoca-rbusa,
+    kunnr TYPE acdoca-kunnr,
+    matnr TYPE acdoca-matnr,
+    matkl TYPE mara-matkl,
+    wgbez TYPE t023t-wgbez,
+    budat TYPE acdoca-budat,
+    msl TYPE acdoca-msl,
+    runit TYPE acdoca-runit,
+    wsl TYPE acdoca-wsl,
+    ksl TYPE acdoca-ksl,
+    rwcur TYPE acdoca-rwcur,
+    rkcur TYPE acdoca-rkcur,
+  END OF gt_acdoca,
+  ls_acdoca LIKE LINE OF gt_acdoca,
+  BEGIN OF gt_alv OCCURS 0,
+    fyper TYPE acdoca-fiscyearper,
+    matnr TYPE acdoca-matnr,
+    msl TYPE acdoca-msl,
+    budat TYPE acdoca-budat,
+    wsl TYPE acdoca-wsl,
+    ksl TYPE acdoca-ksl,
+    rwcur TYPE acdoca-rwcur,
+    rkcur TYPE acdoca-rkcur,
+    matkl TYPE mara-matkl,
+    wgbez TYPE t023t-wgbez,
+    pvprs TYPE ckmlcr-pvprs,
+    cost TYPE ckmlcr-pvprs,
+  END OF gt_alv,
+  gs_alv LIKE LINE OF gt_alv,
+  gt_sum LIKE STANDARD TABLE OF gt_alv WITH HEADER LINE,
+  BEGIN OF gt_ckmlcr OCCURS 0,
+    kalnr TYPE ckmlhd-kalnr,
+    bdatj TYPE ckmlcr-bdatj,
+    poper TYPE ckmlcr-poper,
+    matnr TYPE ckmlhd-matnr,
+    bwkey TYPE ckmlhd-bwkey,
+    curtp TYPE ckmlcr-curtp,
+    pvprs TYPE ckmlcr-pvprs,
+    peinh TYPE ckmlcr-peinh,
+    waers TYPE ckmlcr-waers,
+    fyper(7) TYPE n,
+  END OF gt_ckmlcr,
+  BEGIN OF gt_excel_output OCCURS 0,
+        msl TYPE acdoca-msl,
+        budat TYPE acdoca-budat,
+        wsl TYPE ztim_test28d5,
+        ksl TYPE  ztim_test28d6,
+        wgbez TYPE ztim_test28d1,
+        pvprs TYPE ztim_test28d2,
+        cost TYPE ztim_test28d3,
+        profit TYPE ztim_test28d4,
+  END OF gt_excel_output,
+  lv_level   TYPE i. " EXCEL 輸出用.
+
+  FIELD-SYMBOLS: <fs_alv> LIKE gt_alv.
+
+  DATA: go_container TYPE REF TO cl_gui_splitter_container,    " 畫面容器物件
+      gr_tree      TYPE REF TO cl_salv_tree,  " ALV Tree 物件
+      gr_top_list  TYPE REF TO cl_salv_form_element,   " ALV Tree Top List
+      gr_label     TYPE REF TO cl_salv_form_label,   " ALV Label
+      gr_text      TYPE REF TO cl_salv_form_text,   " ALV Text
+      gr_columns   TYPE REF TO cl_salv_columns_tree, " Tree 欄位設定物件
+      "lr_columns TYPE REF TO cl_salv_columns,
+      gr_node      TYPE REF TO cl_salv_node, "  節點物件
+      BEGIN OF gt_tree_list OCCURS 0,    " 建立 Tree 使用 Table
+        msl TYPE acdoca-msl,
+        budat TYPE acdoca-budat,
+        wsl TYPE ztim_test28d5,
+        ksl TYPE  ztim_test28d6,
+        wgbez TYPE ztim_test28d1,
+        pvprs TYPE ztim_test28d2,
+        cost TYPE ztim_test28d3,
+        profit TYPE ztim_test28d4,
+      END OF gt_tree_list,
+      gs_tree LIKE LINE OF gt_tree_list ,  " 建立 Tree 節點使用 Structure
+      BEGIN OF gt_excel_list OCCURS 0,
+        text TYPE lvc_value,
+        msl TYPE acdoca-msl,
+        budat TYPE acdoca-budat,
+        wsl TYPE ztim_test28d5,
+        ksl TYPE  ztim_test28d6,
+        wgbez TYPE ztim_test28d1,
+        pvprs TYPE ztim_test28d2,
+        cost TYPE ztim_test28d3,
+        profit TYPE ztim_test28d4,
+      END OF gt_excel_list,
+      gs_excel_list LIKE LINE OF gt_excel_list,
+      "  轉換 Tree ALV 至  一般 ALV，需使用到節點 Table、Structure
+      lt_nodes     TYPE salv_t_nodes,
+      ls_node      LIKE LINE OF lt_nodes.
+
+" 圖表工具
+DATA:
+      gt_val TYPE TABLE OF gprval,
+      gs_val TYPE gprval,
+      gt_col TYPE TABLE OF gprtxt,
+      gs_col TYPE gprtxt.
+
+" 畫面控制欄位
+DATA ok_code LIKE sy-ucomm.
+
+RANGES: gr_racct FOR acdoca-racct,
+  gr_bwkey FOR ckmlhd-bwkey.
+
+SELECTION-SCREEN BEGIN OF BLOCK blk1 WITH FRAME TITLE TEXT-001.
+  SELECT-OPTIONS: s_fyper FOR acdoca-fiscyearper.
+  PARAMETERS: p_prctr TYPE acdoca-prctr.
+  SELECT-OPTIONS: s_matkl FOR mara-matkl.
+SELECTION-SCREEN END OF BLOCK blk1.
+
+SELECTION-SCREEN BEGIN OF BLOCK blk2 WITH FRAME TITLE TEXT-002.
+
+SELECTION-SCREEN END OF BLOCK blk2.
+
+SELECTION-SCREEN BEGIN OF BLOCK blk3 WITH FRAME TITLE TEXT-003.
+  PARAMETERS: p_loc LIKE rlgrap-filename OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK blk3.
+
+" 儲存位置設定
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_loc.
+  DATA str TYPE string.
+  CALL METHOD cl_gui_frontend_services=>directory_browse
+    EXPORTING
+      initial_folder  = 'C:\'
+    CHANGING
+      selected_folder = str
+    EXCEPTIONS
+      cntl_error      = 1
+      error_no_gui    = 2
+      OTHERS          = 3.
+  IF sy-subrc = 0.
+    CALL METHOD cl_gui_cfw=>flush( ).
+    IF NOT str IS INITIAL.
+      p_loc = str.
+    ENDIF.
+  ENDIF.
+
+START-OF-SELECTION.
+
+gr_racct-sign = 'I'.
+gr_racct-option = 'BT'.
+gr_racct-low = '0041110001'.
+gr_racct-high = '0041900002'.
+APPEND gr_racct.
+
+SELECT
+  prctr,
+  bukrs,
+  gsber
+FROM ztim_test28t1
+INTO @DATA(ls_ztim_test28t1)
+WHERE prctr EQ @p_prctr.
+  SELECT
+    acdoca~fiscyearper AS fiscyearper,
+    acdoca~rbusa AS rbusa,
+    acdoca~kunnr AS kunnr,
+    acdoca~matnr AS matnr,
+    mara~matkl AS matkl,
+    t023t~wgbez AS wgbez,
+    acdoca~budat AS budat,
+    acdoca~msl AS msl,
+    acdoca~runit AS runit,
+    acdoca~wsl AS wsl,
+    acdoca~ksl AS ksl,
+    acdoca~rwcur AS rwcur,
+    acdoca~rkcur AS rkcur
+  FROM acdoca
+  INNER JOIN mara
+    ON acdoca~matnr EQ mara~matnr
+  INNER JOIN t023t
+    ON mara~matkl EQ t023t~matkl
+  INTO @ls_acdoca
+  WHERE fiscyearper IN @s_fyper
+    AND rbukrs EQ @ls_ztim_test28t1-bukrs
+    AND rbusa EQ @ls_ztim_test28t1-gsber
+    AND racct IN @gr_racct
+    AND mara~matkl IN @s_matkl
+    AND t023t~spras EQ 'M'.
+    IF ls_acdoca-rbusa EQ '1002'
+      AND ( ls_acdoca-kunnr EQ '0000002002'
+      OR ls_acdoca-kunnr EQ '0000002902' ).
+    ELSEIF ls_acdoca-rbusa EQ '2002'
+      AND ( ls_acdoca-kunnr EQ '0000001002'
+       OR ls_acdoca-kunnr EQ '0000001902' ).
+    ELSE.
+      APPEND ls_acdoca TO gt_acdoca.
+    ENDIF.
+  ENDSELECT.
+ENDSELECT.
+
+SORT gt_acdoca BY matkl matnr budat.
+DATA: lv_ukurs TYPE tcurr-ukurs.
+LOOP AT gt_acdoca.
+  gt_alv-fyper = gt_acdoca-fiscyearper.
+  gt_alv-matnr = gt_acdoca-matnr.
+  gt_alv-msl = gt_acdoca-msl.
+  gt_alv-budat = gt_acdoca-budat.
+  gt_alv-wsl = gt_acdoca-wsl.
+  IF gt_acdoca-rbusa EQ '2002'.
+    CALL FUNCTION 'READ_EXCHANGE_RATE'
+      EXPORTING
+        client                  = sy-mandt
+        date                    = gt_acdoca-budat
+        foreign_currency        = gt_acdoca-rwcur
+        local_currency          = gt_acdoca-rkcur
+        type_of_rate            = 'ZTW3'
+     IMPORTING
+       exchange_rate           = lv_ukurs
+     EXCEPTIONS
+       no_rate_found           = 1
+       no_factors_found        = 2
+       no_spread_found         = 3
+       derived_2_times         = 4
+       overflow                = 5
+       zero_rate               = 6
+       OTHERS                  = 7.
+    gt_alv-ksl = gt_acdoca-wsl * lv_ukurs.
+  ELSE.
+    gt_alv-ksl = gt_acdoca-ksl.
+  ENDIF.
+  gt_alv-rwcur = gt_acdoca-rwcur.
+  gt_alv-matkl = gt_acdoca-matkl.
+  gt_alv-wgbez = gt_acdoca-wgbez.
+  COLLECT gt_alv.
+ENDLOOP.
+
+gr_bwkey-sign = 'E'.
+gr_bwkey-option = 'CP'.
+gr_bwkey-low = '2*'.
+APPEND gr_bwkey.
+
+IF gt_alv IS NOT INITIAL.
+  SELECT
+    hd~kalnr AS kalnr,
+    cr~bdatj AS bdatj,
+    cr~poper AS poper,
+    hd~matnr AS matnr,
+    hd~bwkey AS bwkey,
+    cr~curtp AS curtp,
+    cr~pvprs AS pvprs,
+    cr~peinh AS peinh,
+    cr~waers AS waers
+  FROM ckmlhd AS hd
+  INNER JOIN ckmlcr AS cr
+   ON hd~kalnr EQ cr~kalnr
+  INTO TABLE @gt_ckmlcr
+  FOR ALL ENTRIES IN @gt_alv
+  WHERE hd~matnr EQ @gt_alv-matnr
+    AND hd~bwkey IN @gr_bwkey
+    AND cr~curtp EQ '10'.
+ENDIF.
+
+LOOP AT gt_ckmlcr ASSIGNING FIELD-SYMBOL(<fs_ckmlcr>).
+  <fs_ckmlcr>-fyper = <fs_ckmlcr>-bdatj && <fs_ckmlcr>-poper.
+ENDLOOP.
+
+SORT gt_ckmlcr BY matnr ASCENDING fyper DESCENDING.
+
+LOOP AT gt_alv ASSIGNING <fs_alv>.
+  WHILE <fs_alv>-pvprs IS INITIAL.
+    READ TABLE gt_ckmlcr WITH KEY matnr = <fs_alv>-matnr fyper = <fs_alv>-fyper.
+    IF sy-subrc = 0.
+      IF gt_ckmlcr-fyper IN s_fyper AND gt_ckmlcr-pvprs IS NOT INITIAL.
+        <fs_alv>-pvprs = |{ gt_ckmlcr-pvprs CURRENCY = gt_ckmlcr-waers }|.
+        <fs_alv>-pvprs =  <fs_alv>-pvprs / gt_ckmlcr-peinh.
+        <fs_alv>-cost = <fs_alv>-pvprs * <fs_alv>-msl * -1.
+      ELSE.
+        <fs_alv>-fyper = <fs_alv>-fyper - 1.
+      ENDIF.
+    ELSE.
+      EXIT.
+    ENDIF.
+  ENDWHILE.
+ENDLOOP.
+
+" 進行加總
+LOOP AT gt_alv.
+  gt_sum-matkl  = gt_alv-matkl.
+  gt_sum-wgbez = gt_alv-wgbez && '   加總'.
+  gt_sum-msl = gt_alv-msl.
+  gt_sum-wsl = ''.
+  gt_sum-ksl = gt_alv-ksl.
+  gt_sum-pvprs = gt_alv-pvprs.
+  gt_sum-cost = gt_alv-cost.
+  COLLECT gt_sum.
+ENDLOOP.
+
+LOOP AT gt_sum.
+  APPEND gt_sum TO gt_alv.
+ENDLOOP.
+SORT gt_alv BY matkl matnr budat.
+
+RANGES:gr_wgbez FOR t023t-wgbez.
+gr_wgbez-sign = 'I'.
+gr_wgbez-option = 'CP'.
+gr_wgbez-low = '*加總'.
+APPEND gr_wgbez.
+
+LOOP AT gt_alv.
+  IF gt_alv-wgbez IN gr_wgbez.
+    gs_alv-wgbez = '總計'.
+    gs_alv-msl = gs_alv-msl + gt_alv-msl.
+    gs_alv-ksl = gs_alv-ksl + gt_alv-ksl.
+    gs_alv-cost = gs_alv-cost + gt_alv-cost.
+  ENDIF.
+ENDLOOP.
+INSERT gs_alv INTO gt_alv INDEX 1.
+
+CALL SCREEN 1100.
+
+*&---------------------------------------------------------------------*
+*&           Module STATUS_1100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE status_1100 OUTPUT.
+  SET PF-STATUS 'STATUS'.
+  SET TITLEBAR 'T001'.
+  PERFORM build_tree.
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&         Module USER_COMMAND_1100 INPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE user_command_1100 INPUT.
+  CASE ok_code.
+    WHEN 'F03' OR 'F04' OR 'F05'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXCEL'.
+      PERFORM convert_alv.
+  ENDCASE.
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&                           Form BUILD_TREE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM build_tree.
+  DATA: lv_node_key1 TYPE lvc_nkey,
+        lv_node_key2 TYPE lvc_nkey,
+        lv_node_key3 TYPE lvc_nkey,
+        lv_node_title TYPE lvc_value.
+
+  " 產生畫面容器給AVL Tree 使用
+  CREATE OBJECT go_container
+    EXPORTING
+      parent  = cl_gui_container=>default_screen
+      rows    = 1
+      columns = 1.
+  " 判斷 ALV 是否建立，由於是使用 Call Screen 方式
+  " 建立，如果重複於同樣畫面容器建立，會出現 Dump
+  IF gr_tree IS NOT BOUND.
+    " 透過Call Function方式，建立 ALV Tree
+    cl_salv_tree=>factory(
+      EXPORTING
+        r_container   =   go_container->get_container( row = 1 column = 1 ) " 設定物件需放於 Screen 的哪個位置
+      IMPORTING
+        r_salv_tree  = gr_tree " 將生成物件放入自己建立的 Tree 物件
+      CHANGING
+        t_table     = gt_tree_list[] " 放入 Tree 的 Table，後續建立節點皆需與此結構相同
+    ).
+
+    DATA: gr_top_list TYPE REF TO cl_salv_form_element,
+          lr_grid     TYPE REF TO cl_salv_form_layout_grid.
+
+    CREATE OBJECT lr_grid.
+
+    "  表頭 資訊
+    PERFORM tree_header CHANGING lr_grid.
+
+    gr_top_list = lr_grid.
+    gr_tree->set_top_of_list( gr_top_list ).
+
+    " 設定 ALV Tree 欄位
+    gr_columns = gr_tree->get_columns( ).
+    "最佳化爛位寬度設定
+    gr_columns->set_optimize( abap_true ).
+
+    DATA: lv_header_key TYPE lvc_nkey,
+          lv_key TYPE lvc_nkey,
+          lv_profit TYPE acdoca-ksl.
+
+    LOOP AT gt_alv.
+      gs_tree-msl = gt_alv-msl.
+      gs_tree-budat  = gt_alv-budat.
+      gs_tree-ksl = |{ gt_alv-ksl CURRENCY = 'TWD' }|.
+      gs_tree-pvprs = gt_alv-pvprs.
+      gs_tree-cost = gt_alv-cost.
+      " 計算毛利率
+      lv_profit = ( gs_tree-cost / ( -1 * gs_tree-ksl ) ) * 100.
+      lv_profit = 100 - lv_profit.
+      gs_tree-profit = lv_profit.
+      IF gt_alv-wgbez EQ '總計'.
+        lv_node_title = '總計'.
+        gr_node = gr_tree->get_nodes( )->add_node(
+              related_node = space      " 無上階，則帶空值
+              text     = lv_node_title
+              data_row = gs_tree  " 帶入 Tree 項目資料
+              relationship = cl_gui_column_tree=>relat_last_child ).
+        lv_header_key = gr_node->get_key( ).
+      ELSEIF gt_alv-wgbez CA '加總'.
+        lv_node_title = gt_alv-wgbez.
+        IF lv_header_key IS NOT INITIAL.
+          gr_node = gr_tree->get_nodes( )->add_node(
+                related_node = lv_header_key      " 無上階，則帶空值
+                text     = lv_node_title
+                data_row = gs_tree  " 帶入 Tree 項目資料
+                relationship = cl_gui_column_tree=>relat_last_child ).
+          lv_key = gr_node->get_key( ).
+        ENDIF.
+      ELSE.
+        IF lv_key IS NOT INITIAL.
+          lv_node_title = gt_alv-matnr.
+          gs_tree-wsl = gt_alv-wsl.
+          gs_tree-wgbez = gt_alv-wgbez.
+          gr_node = gr_tree->get_nodes( )->add_node(
+              related_node = lv_key      " 帶入上階
+              text     = lv_node_title
+              data_row = gs_tree  " 帶入 Tree 項目資料
+              relationship = cl_gui_column_tree=>relat_last_child ).
+        ENDIF.
+      ENDIF.
+      CLEAR: gs_tree.
+    ENDLOOP.
+
+    "  產生 ALV 工具
+    gr_tree->set_screen_status(
+      EXPORTING
+        report        = sy-repid    " ABAP Program: Current Master Program
+        pfstatus      = 'STATUS'    " Screens, Current GUI Status
+        set_functions = gr_tree->c_functions_all    " ALV: Data Element for Constants
+    ).
+
+    gr_tree->display( ).
+  ENDIF.
+
+*  DATA: lr_container TYPE REF TO cl_gui_container,
+*        lr_custom_container TYPE REF TO cl_gui_custom_container,
+*        lv_conatiner_name TYPE string.
+*
+*  lr_container = go_container->get_container( row = 1 column = 2 ).
+*
+*  CREATE OBJECT lr_custom_container
+*    EXPORTING
+*      parent = lr_container
+*      container_name = 'Chart_Container'
+*    EXCEPTIONS
+*      cntl_error = 1
+*      cntl_system_error = 2
+*      create_error = 3
+*      lifetime_error = 4
+*      lifetime_dynpro_dynpro_link = 5.
+*  CALL FUNCTION 'GFW_PRES_SHOW'
+*    EXPORTING
+*      container               = 'Chart_Container'
+*      presentation_type       = 29
+*      header                  = '產品類型占比'
+*    TABLES
+*      values                  = gt_val
+*      column_texts            = gt_col.
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                      Form TREE_HEADER
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM tree_header
+  CHANGING lr_grid TYPE REF TO cl_salv_form_layout_grid.
+  DATA lv_text TYPE string.
+
+  IF p_prctr EQ '20S00' OR p_prctr EQ '20Q00' .
+    lv_text = '扣件'.
+  ELSEIF p_prctr EQ '20E00'.
+    lv_text = '醫療'.
+  ELSEIF p_prctr EQ '20T00'.
+    lv_text = '微波'.
+  ELSEIF p_prctr EQ '20B00'.
+    lv_text = '植入物'.
+  ELSEIF p_prctr EQ '20R00'.
+    lv_text = 'SFR'.
+  ELSEIF p_prctr EQ '20D00'.
+    lv_text = '牙科'.
+  ENDIF.
+
+  lr_grid->create_header_information(
+    row     =  1
+    column   = 1
+    text     = '事業處：'
+    tooltip  = '事業處：'
+  ).
+
+  lr_grid->create_header_information(
+    row     =  1
+    column   = 2
+    text     = lv_text
+    tooltip  = lv_text
+  ).
+
+  lr_grid->add_row( ).
+
+  CLEAR: lv_text.
+
+  lr_grid->create_label(
+    row     = 3
+    column   = 1
+    text     = '期間：'
+    tooltip    = '期間：'
+  ).
+
+  LOOP AT s_fyper.
+    IF s_fyper-option = 'EQ'.
+      lv_text = s_fyper-low.
+    ELSEIF s_fyper-option = 'BT'.
+      lv_text = s_fyper-low && '-' && s_fyper-high.
+    ENDIF.
+  ENDLOOP.
+  lr_grid->create_text(
+    row   = 3
+    column   = 2
+    text   =   lv_text
+    tooltip    = lv_text
+  ).
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                      Form CONVERT_ALV
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM convert_alv.
+  DATA: lr_table TYPE REF TO cl_salv_table, " 一般 ALV 物件
+        lt_table TYPE REF TO data,
+        lr_data  TYPE REF TO data,
+        lv_space TYPE x LENGTH 2 VALUE '0030'.  " 空格，由於ALV會自動將空格清除，故使用 16 進制字元
+  DATA: lv_text TYPE lvc_value.
+  FIELD-SYMBOLS <lv_c>.
+  ASSIGN lv_space TO <lv_c> TYPE 'C'.  " 將 16 進制字元轉換為 Char
+
+  FIELD-SYMBOLS:
+                 <data>  TYPE any,
+                 <table> TYPE STANDARD TABLE,
+                 <str>   TYPE any.
+  " 取得所有 Tree ALV 節點資料
+  lt_nodes = gr_tree->get_nodes( )->get_all_nodes( ).
+
+  " 處理節點資料
+  LOOP AT lt_nodes INTO ls_node.
+    gr_node = ls_node-node.
+    CLEAR lv_level.
+    DO.
+      TRY.
+        gr_node = gr_node->get_parent( ).
+        ADD 1 TO lv_level.
+      CATCH cx_salv_msg.
+        EXIT.
+      ENDTRY.
+    ENDDO.
+    lr_data = ls_node-node->get_data_row( ).
+    lv_text = ls_node-node->get_text( ).
+    ASSIGN lr_data->* TO <data>.
+
+    IF <table> IS NOT ASSIGNED.
+      CREATE DATA lt_table LIKE STANDARD TABLE OF gt_excel_list.
+      ASSIGN lt_table->* TO <table>.
+    ENDIF.
+    ASSIGN lv_text TO <str>.
+    SUBTRACT 1 FROM lv_level.
+    DO lv_level TIMES.
+      CONCATENATE <lv_c> <str> INTO <str>.
+    ENDDO.
+    MOVE-CORRESPONDING <data> TO gs_excel_list.
+    gs_excel_list-text = lv_text.
+    APPEND gs_excel_list TO <table>.
+  ENDLOOP.
+  cl_salv_table=>factory(
+    EXPORTING
+      r_container   =   go_container->get_container( row = 1 column = 1 )
+    IMPORTING
+      r_salv_table = lr_table
+    CHANGING
+      t_table = <table> ).
+
+  "lr_table->display( ).
+  PERFORM convert_xml USING lr_table.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                      Form CONVERT_XML
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM convert_xml USING lr_table TYPE REF TO cl_salv_table.
+  DATA lv_xlsx TYPE xstring.
+  lv_xlsx = lr_table->to_xml( if_salv_bs_xml=>c_type_xlsx ).
+
+  DATA: lr_zip         TYPE REF TO cl_abap_zip,
+        lr_xlnode      TYPE REF TO if_ixml_node,
+        lr_xldimension TYPE REF TO if_ixml_node,
+        lr_xlsheetpr   TYPE REF TO if_ixml_element,
+        lr_xloutlinepr TYPE REF TO if_ixml_element,
+        lv_file        TYPE xstring,
+        lr_file        TYPE REF TO cl_xml_document,
+        lr_xlrows      TYPE REF TO if_ixml_node_list,
+        lr_xlrow       TYPE REF TO if_ixml_element,
+        lr_xlformat    TYPE REF TO if_ixml_element,
+        lr_xlworksheet TYPE REF TO if_ixml_element,
+        lv_tabix       TYPE i,
+        lv_maxlevel    TYPE i,
+        lv_levels      TYPE string.
+
+  CREATE OBJECT lr_zip.
+
+  lr_zip->load( lv_xlsx ).
+  " 建立 XML 的 Excel 格式
+  lr_zip->get(
+    EXPORTING
+      name = 'xl/worksheets/sheet1.xml'
+    IMPORTING
+      content = lv_file ).
+  "  產生檔案物件
+  CREATE OBJECT lr_file.
+
+  lr_file->parse_xstring( lv_file ).
+
+  lr_xlnode = lr_file->find_node( 'sheetData' ).
+  lr_xlrows = lr_xlnode->get_children( ).
+
+  DATA lv_var TYPE i.
+  lv_var = lr_xlrows->get_length( ).
+
+  DO lr_xlrows->get_length( ) TIMES.
+    lv_tabix = sy-index - 1.
+    lr_xlrow ?= lr_xlrows->get_item( lv_tabix ).
+
+    READ TABLE lt_nodes INTO ls_node INDEX lv_tabix.
+    IF sy-subrc EQ 0.
+      gr_node = ls_node-node.
+
+      CLEAR lv_level.
+      DO.
+        TRY.
+          gr_node = gr_node->get_parent( ).
+          ADD 1 TO lv_level.
+        CATCH cx_salv_msg.
+          EXIT.
+        ENDTRY.
+      ENDDO.
+
+      SUBTRACT 1 FROM lv_level.
+      IF lv_level NE 0.
+        lv_levels = lv_level.
+        IF lv_level > lv_maxlevel.
+          lv_maxlevel = lv_level.
+        ENDIF.
+
+        CONDENSE lv_levels.
+
+        lr_xlrow->set_attribute( name = 'outlineLevel' value = lv_levels ).
+        lr_xlrow->set_attribute( name = 'hidden' value = 'true'  ).
+      ENDIF.
+    ENDIF.
+  ENDDO.
+
+  lv_levels = lv_maxlevel.
+  CONDENSE lv_levels.
+
+  lr_xlformat ?= lr_file->find_node( 'sheetFormatPr' ).
+  lr_xlformat->set_attribute( name = 'outlineLevelRow' value = lv_levels ).
+  lr_xlworksheet ?= lr_file->find_node( 'worksheet' ).
+  lr_xldimension ?= lr_file->find_node( 'dimension' ).
+  lr_xlsheetpr = cl_ixml=>create( )->create_document( )->create_element( name = 'sheetPr' ).
+  lr_xloutlinepr = cl_ixml=>create( )->create_document( )->create_element( name = 'outlinePr' ).
+  lr_xlsheetpr->if_ixml_node~append_child( lr_xloutlinepr ).
+  lr_xloutlinepr->set_attribute( name = 'summaryBelow' value = 'false' ).
+  lr_xlworksheet->if_ixml_node~insert_child( new_child = lr_xlsheetpr ref_child = lr_xldimension ).
+
+  lr_file->render_2_xstring(
+    IMPORTING
+      stream = lv_file ).
+
+  lr_zip->delete(
+    EXPORTING
+      name = 'xl/worksheets/sheet1.xml' ).
+
+  lr_zip->add(
+    EXPORTING name = 'xl/worksheets/sheet1.xml'
+      content = lv_file ).
+
+  lv_xlsx = lr_zip->save( ).
+  PERFORM download_file USING lv_xlsx.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                 Form DOWNLOAD_FILE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM download_file USING pv_xlsx TYPE xstring.
+  DATA lv_size TYPE i.
+  DATA: lt_bintab   TYPE solix_tab,
+        pv_fullpath TYPE string.
+
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer        = pv_xlsx
+      IMPORTING
+        output_length = lv_size
+      TABLES
+        binary_tab    = lt_bintab.
+
+  IF lt_bintab IS INITIAL.
+    EXIT.
+  ENDIF.
+
+  pv_fullpath = p_loc && '\' && '合併收入成本報表.XLSX'.
+
+  cl_gui_frontend_services=>gui_download(
+    EXPORTING
+      bin_filesize              = lv_size
+      filename                  = pv_fullpath
+      filetype                  = 'BIN'
+    CHANGING
+      data_tab                  = lt_bintab
+    EXCEPTIONS
+      file_write_error          = 1
+      no_batch                  = 2
+      gui_refuse_filetransfer   = 3
+      invalid_type              = 4
+      no_authority              = 5
+      unknown_error             = 6
+      header_not_allowed        = 7
+      separator_not_allowed     = 8
+      filesize_not_allowed      = 9
+      header_too_long           = 10
+      dp_error_create           = 11
+      dp_error_send             = 12
+      dp_error_write            = 13
+      unknown_dp_error          = 14
+      access_denied             = 15
+      dp_out_of_memory          = 16
+      disk_full                 = 17
+      dp_timeout                = 18
+      file_not_found            = 19
+      dataprovider_exception    = 20
+      control_flush_error       = 21
+      not_supported_by_gui      = 22
+      error_no_gui              = 23
+      OTHERS                    = 24
+  ).
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+      WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 .
+  ENDIF.
+
+ENDFORM.
