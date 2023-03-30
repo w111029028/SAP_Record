@@ -1,0 +1,476 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI007F1_ANNOUNCE
+*&---------------------------------------------------------------------*
+
+FORM announce_information_sheet.
+  DATA:
+    lv_fiscper                TYPE rwcoom-fiscper,
+    lv_last_fiscper           TYPE rwcoom-fiscper,
+    lv_tmp_year               TYPE acdoca-gjahr,
+    lv_tmp_poper              TYPE acdoca-poper,
+    lv_index                  TYPE i,
+    lv_index_tmp              TYPE i,
+    lv_string_tmp             TYPE string,
+    lv_aggregated_tmp       TYPE acdoca-tsl,
+    lv_aggregated_1           TYPE acdoca-tsl,
+    lv_aggregated_2           TYPE acdoca-tsl,
+    lv_grand                  TYPE acdoca-tsl,
+    lv_last_grand             TYPE acdoca-tsl,
+    lv_gap                    TYPE p DECIMALS 4,
+    ls_history_revenue        TYPE zfi007t2,
+    ls_history_revenue_update TYPE zfi007t2.
+
+  DATA: lv_amount TYPE acdoca-tsl.
+
+  lv_index = 0.
+
+  CALL METHOD OF lo_application 'Sheets' = lo_worksheets .
+  CALL METHOD OF lo_worksheets 'Add' = lo_worksheet1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+  SET PROPERTY OF lo_worksheet1 'Name' = '公告資料'.
+
+  CALL METHOD OF lo_application 'Worksheets' = lo_worksheet1 EXPORTING #1 = 1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A1'
+        #2 = 'A1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '27.00'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'B1'
+        #2 = 'B1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '16.64'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'C1'
+        #2 = 'C1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '13.73'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'D1'
+        #2 = 'D1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'E1'
+        #2 = 'E1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.36'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'F1'
+        #2 = 'F1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'G1'
+        #2 = 'G1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '7.27'.
+
+  "取歷年營收資料
+  DATA lv_gjahr TYPE acdoca-gjahr.
+  lv_gjahr = p_gjahr - 2.
+  SELECT
+    *
+    FROM zfi007t2
+    INTO TABLE @DATA(lt_history_revenue)
+    WHERE ( gjahr EQ @p_gjahr
+            OR gjahr GE @lv_gjahr ).
+
+  lv_index = 0.
+  lv_fiscper = p_gjahr && p_poper.
+
+  " 產生歷史資料，區間為一年
+  DO 12 TIMES.
+    lv_index = lv_index + 1.
+    DATA: lv_col_1 TYPE string,
+          lv_col_2 TYPE string.
+
+    lv_index_tmp = lv_index + 1.
+    lv_col_1  = 'A' && lv_index_tmp.
+    lv_col_2  = 'G' && lv_index_tmp.
+    CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+        EXPORTING
+          #1 = lv_col_1
+          #2 = lv_col_2.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'. "xlEdgeBottom
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '8'. "xlEdgeBottom
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+    lv_index_tmp = lv_index + 1.
+    lv_col_1  = 'A' && lv_index_tmp.
+    lv_index_tmp = lv_index + 5.
+    lv_col_2  = 'G' && lv_index_tmp.
+    CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+        EXPORTING
+          #1 = lv_col_1
+          #2 = lv_col_2.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'. "xlEdgeBottom
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '8'. "xlEdgeBottom
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+    lv_index_tmp = lv_index + 1.
+    lv_col_1  = 'A' && lv_index_tmp.
+    lv_index_tmp = lv_index + 5.
+    lv_col_2  = 'A' && lv_index_tmp.
+    CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+        EXPORTING
+          #1 = lv_col_1
+          #2 = lv_col_2.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'. "xlContinuous
+
+    lv_index_tmp = lv_index + 1.
+    lv_col_1  = 'D' && lv_index_tmp.
+    lv_index_tmp = lv_index + 5.
+    lv_col_2  = 'D' && lv_index_tmp.
+    CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+        EXPORTING
+          #1 = lv_col_1
+          #2 = lv_col_2.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'. "xlContinuous
+
+    lv_index_tmp = lv_index + 1.
+    lv_col_1  = 'G' && lv_index_tmp.
+    lv_index_tmp = lv_index + 5.
+    lv_col_2  = 'G' && lv_index_tmp.
+    CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+        EXPORTING
+          #1 = lv_col_1
+          #2 = lv_col_2.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+    CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+    SET PROPERTY OF lo_borders 'LineStyle' = '1'. "xlContinuous
+
+    lv_string_tmp = lv_fiscper+0(4) - 1911.
+    lv_string_tmp = '公告資料： ' && lv_string_tmp+0(3) && '/' && lv_fiscper+5(2).
+    cell lo_worksheet1 lv_index 1 lv_string_tmp 2 '0'.
+
+    lv_string_tmp = lv_fiscper+0(4) && '/' && lv_fiscper+5(2).
+
+    lv_index = lv_index + 1.
+    cell:
+      lo_worksheet1 lv_index 1 '摘要' 3 '0',
+      lo_worksheet1 lv_index 2 '期間' 3 '0',
+      lo_worksheet1 lv_index 3 '金額(NTD)' 3 '0',
+      lo_worksheet1 lv_index 4 '金額(仟元)' 3 '0',
+      lo_worksheet1 lv_index 5 '與同期差%' 3 '0',
+      lo_worksheet1 lv_index 6 '與上月差%' 3 '0'.
+
+    " 計算營業收入淨額'
+    lv_index = lv_index + 1.
+    cell:
+      lo_worksheet1 lv_index 1 '本月營業收入淨額' 2 '0',
+      lo_worksheet1 lv_index 2 lv_string_tmp 2 '0'.
+
+    IF sy-index EQ 1.
+      lv_aggregated_1 = gv_aggregated / 1000.
+      cell:
+        lo_worksheet1 lv_index 3 gv_aggregated 4 'TWD',
+        lo_worksheet1 lv_index 4 lv_aggregated_1 4 'TWD'.
+      ls_history_revenue_update-mandt = sy-mandt.
+      ls_history_revenue_update-gjahr = lv_fiscper+0(4).
+      ls_history_revenue_update-poper = lv_fiscper+5(2).
+
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = gv_aggregated
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+      gv_aggregated = lv_amount / 100.
+      ls_history_revenue_update-total_income_current_month = gv_aggregated.
+
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = lv_aggregated_1
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 31
+          OTHERS        = 4.
+      lv_aggregated_tmp = lv_aggregated_1.
+      lv_aggregated_1 = lv_amount / 100.
+      ls_history_revenue_update-total_income_t_current_month = lv_aggregated_1.
+      ls_history_revenue_update-tkcur = 'TWD'.
+      lv_aggregated_1 = lv_aggregated_tmp.
+    ELSE.
+      READ TABLE lt_history_revenue
+        WITH KEY gjahr = lv_fiscper+0(4)  poper = lv_fiscper+5(2)
+        INTO ls_history_revenue.
+      ls_history_revenue-total_income_current_month = |{ ls_history_revenue-total_income_current_month CURRENCY = ls_history_revenue-tkcur }|.
+      ls_history_revenue-total_income_t_current_month = |{ ls_history_revenue-total_income_t_current_month CURRENCY = ls_history_revenue-tkcur }|.
+      lv_aggregated_1 = ls_history_revenue-total_income_t_current_month.
+      cell:
+        lo_worksheet1 lv_index 3 ls_history_revenue-total_income_current_month 4 'TWD',
+        lo_worksheet1 lv_index 4 ls_history_revenue-total_income_t_current_month 4 'TWD'.
+    ENDIF.
+
+    lv_index = lv_index + 1.
+
+    " 計算去年同月
+    IF  sy-index EQ 1.
+      lv_tmp_year = lv_fiscper+0(4).
+      lv_tmp_year = lv_tmp_year - 1.
+      lv_last_fiscper = lv_tmp_year && lv_fiscper+4(3).
+      lv_string_tmp = lv_last_fiscper+0(4) && '/' && lv_last_fiscper+5(2).
+
+      READ TABLE lt_history_revenue
+        WITH KEY gjahr = lv_tmp_year poper = lv_fiscper+5(2)
+        INTO ls_history_revenue.
+      ls_history_revenue-total_income_current_month = |{ ls_history_revenue-total_income_current_month CURRENCY = ls_history_revenue-tkcur }|.
+      lv_aggregated_2 = ls_history_revenue-total_income_t_current_month * 100.
+
+      cell:
+        lo_worksheet1 lv_index 1 '去年本月營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 ls_history_revenue-total_income_current_month 4 'TWD',
+        lo_worksheet1 lv_index 4 lv_aggregated_2 4 'TWD'.
+
+      ls_history_revenue_update-total_income_last_month = ls_history_revenue-total_income_current_month / 100.
+      lv_aggregated_tmp = lv_aggregated_2.
+      lv_aggregated_2 = ls_history_revenue-total_income_current_month / 1000.
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = lv_aggregated_2
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+      lv_aggregated_2 = lv_amount / 100.
+      ls_history_revenue_update-total_income_t_last_month = lv_aggregated_2.
+      lv_aggregated_2 = lv_aggregated_tmp.
+    ELSEIF sy-index NE 1.
+      READ TABLE lt_history_revenue
+        WITH KEY gjahr = lv_fiscper+0(4) poper = lv_fiscper+5(2)
+        INTO ls_history_revenue.
+      ls_history_revenue-total_income_last_month = |{ ls_history_revenue-total_income_last_month CURRENCY =  ls_history_revenue-tkcur }|.
+      ls_history_revenue-total_income_t_last_month = |{ ls_history_revenue-total_income_t_last_month CURRENCY =  ls_history_revenue-tkcur }|.
+      cell:
+        lo_worksheet1 lv_index 1 '去年本月營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 ls_history_revenue-total_income_last_month 4 'TWD',
+        lo_worksheet1 lv_index 4 ls_history_revenue-total_income_t_last_month 4 'TWD'.
+      lv_aggregated_2 = ls_history_revenue-total_income_t_last_month.
+    ENDIF.
+
+    "  計算去年同期差 %
+    lv_index_tmp = lv_index - 1.
+    lv_gap = ( lv_aggregated_1 - lv_aggregated_2 ) / lv_aggregated_2.
+    lv_gap = lv_gap * 100.
+    lv_string_tmp = lv_gap && '%'.
+    cell:
+      lo_worksheet1 lv_index_tmp 5 lv_string_tmp 4 '0'.
+
+    "  計算上月差%
+    lv_tmp_poper = lv_fiscper+5(2).
+    IF lv_tmp_poper EQ 1.
+      lv_tmp_year = lv_fiscper+0(4) - 1.
+      lv_tmp_poper = 12.
+    ELSEIF lv_tmp_poper NE 1.
+      lv_tmp_year = lv_fiscper+0(4).
+      lv_tmp_poper = lv_tmp_poper - 1.
+    ENDIF.
+    READ TABLE lt_history_revenue
+      WITH KEY gjahr = lv_tmp_year poper = lv_tmp_poper
+      INTO ls_history_revenue.
+    lv_aggregated_2 = |{ ls_history_revenue-total_income_current_month CURRENCY = ls_history_revenue-tkcur }|.
+    lv_aggregated_2 = lv_aggregated_2 / 1000.
+    lv_gap = ( lv_aggregated_1 - lv_aggregated_2 ) / lv_aggregated_2.
+    lv_gap = lv_gap * 100.
+    lv_string_tmp = lv_gap && '%'.
+    cell:
+      lo_worksheet1 lv_index_tmp 6 lv_string_tmp 4 '0'.
+
+    " 計算今年累計淨額
+    lv_index = lv_index + 1.
+    lv_string_tmp = lv_fiscper+0(4) && '/01' && '-'
+             && lv_fiscper+0(4) && '/' && lv_fiscper+5(2).
+    IF sy-index EQ 1.
+      LOOP AT lt_history_revenue INTO ls_history_revenue
+        WHERE poper LT lv_fiscper+5(2)
+          AND gjahr EQ lv_fiscper+0(4) .
+        lv_grand = lv_grand + ls_history_revenue-total_income_current_month.
+      ENDLOOP.
+      lv_grand = |{ lv_grand CURRENCY = ls_history_revenue-tkcur }|.
+      gv_aggregated = gv_aggregated * 100.
+      lv_grand = lv_grand + gv_aggregated.
+      cell:
+        lo_worksheet1 lv_index 1 '本年累計營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 lv_grand 4 'TWD'.
+
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = lv_grand
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+      lv_grand = lv_amount / 100.
+      ls_history_revenue_update-accumulate_income_this_year = lv_grand.
+
+      lv_grand = lv_grand * 100 / 1000.
+      cell lo_worksheet1 lv_index 4 lv_grand 4 'TWD'.
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = lv_grand
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+      lv_grand = lv_amount / 100.
+      ls_history_revenue_update-accumulate_income_t_this_year = lv_grand.
+      IF lv_fiscper+5(2) NE '01'.
+        DATA: lv_poper TYPE zfi007t2-poper,
+              lv_tmp_ksl TYPE zfi007t2-total_income_t_current_month.
+        lv_poper = lv_fiscper+5(2).
+        lv_poper = lv_poper - 1.
+        SELECT SINGLE
+          *
+        FROM zfi007t2
+        INTO @DATA(ls_zfi007t2)
+        WHERE gjahr EQ @lv_fiscper+0(4)
+          AND poper EQ @lv_poper.
+        lv_tmp_ksl = ( lv_grand - ls_zfi007t2-accumulate_income_t_this_year ) * 100.
+        cell lo_worksheet1 3 4 lv_tmp_ksl 4 'TWD'.
+        ls_history_revenue_update-total_income_t_current_month = lv_tmp_ksl / 100.
+      ENDIF.
+
+    ELSEIF sy-index NE 1.
+      READ TABLE lt_history_revenue INTO ls_history_revenue
+        WITH KEY poper = lv_fiscper+5(2) gjahr = lv_fiscper+0(4) .
+      ls_history_revenue-accumulate_income_this_year = |{ ls_history_revenue-accumulate_income_this_year CURRENCY = ls_history_revenue-tkcur }|.
+      lv_grand = ls_history_revenue-accumulate_income_this_year.
+      cell:
+        lo_worksheet1 lv_index 1 '本年累計營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 lv_grand 4 'TWD'.
+      cell lo_worksheet1 lv_index 4 ls_history_revenue_update-accumulate_income_t_this_year 4 'TWD'.
+      ls_history_revenue-accumulate_income_t_this_year = |{ ls_history_revenue-accumulate_income_t_this_year CURRENCY = ls_history_revenue-tkcur }|.
+      lv_grand = ls_history_revenue-accumulate_income_t_this_year.
+      cell lo_worksheet1 lv_index 4 lv_grand 4 'TWD'.
+    ENDIF.
+
+    "計算去年累計淨額
+    lv_index = lv_index + 1.
+    lv_tmp_year = lv_fiscper+0(4) - 1.
+    lv_string_tmp = lv_tmp_year && '/01' && '-'
+      && lv_tmp_year && '/' && lv_fiscper+5(2).
+    IF sy-index EQ 1.
+      LOOP AT lt_history_revenue INTO ls_history_revenue
+        WHERE poper LE lv_fiscper+5(2)
+          AND gjahr EQ lv_tmp_year.
+        lv_last_grand = lv_last_grand + ls_history_revenue-total_income_current_month.
+      ENDLOOP.
+      lv_last_grand = |{ lv_last_grand CURRENCY = ls_history_revenue-tkcur }|.
+
+      cell:
+        lo_worksheet1 lv_index 1 '去年累計營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 lv_last_grand 4 'TWD'.
+      lv_last_grand = lv_last_grand / 100.
+      ls_history_revenue_update-accumulate_income_last_year = lv_last_grand.
+
+      lv_last_grand = lv_last_grand * 100 / 1000.
+      cell lo_worksheet1 lv_index 4 lv_last_grand 4 'TWD'.
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = lv_last_grand
+          sign          = 'X'
+        IMPORTING
+          output        = lv_amount
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+      lv_last_grand = lv_amount / 100.
+      ls_history_revenue_update-accumulate_income_t_last_year = lv_last_grand.
+    ELSEIF sy-index NE 1.
+      READ TABLE lt_history_revenue INTO ls_history_revenue
+        WITH KEY poper = lv_fiscper+5(2) gjahr = lv_fiscper+0(4) .
+      ls_history_revenue-accumulate_income_last_year = |{ ls_history_revenue-accumulate_income_last_year CURRENCY = ls_history_revenue-tkcur }|.
+      ls_history_revenue-accumulate_income_t_last_year = |{ ls_history_revenue-accumulate_income_t_last_year CURRENCY = ls_history_revenue-tkcur }|.
+      cell:
+        lo_worksheet1 lv_index 1 '去年累計營業收入淨額' 2 '0',
+        lo_worksheet1 lv_index 2 lv_string_tmp 2 '0',
+        lo_worksheet1 lv_index 3 ls_history_revenue-accumulate_income_last_year 4 'TWD',
+        lo_worksheet1 lv_index 4 ls_history_revenue-accumulate_income_t_last_year 4 'TWD'.
+      lv_last_grand = ls_history_revenue-accumulate_income_t_last_year.
+    ENDIF.
+
+    " 計算累計同期差%
+    lv_gap = ( lv_grand - lv_last_grand ) / lv_last_grand.
+    lv_gap = lv_gap * 100.
+    lv_string_tmp = lv_gap && '%'.
+    lv_index_tmp = lv_index - 1.
+    cell lo_worksheet1 lv_index_tmp 5 lv_string_tmp 4 'C'.
+
+    " 年月 - 1
+    lv_index = lv_index + 1.
+    IF lv_fiscper+5(2) EQ 1.
+      lv_fiscper = lv_fiscper - 989.
+    ELSEIF lv_fiscper+5(2) NE 1.
+      lv_fiscper = lv_fiscper - 1.
+    ENDIF.
+
+    IF sy-index = 1.
+      MODIFY zfi007t2 FROM ls_history_revenue_update.
+    ENDIF.
+    CLEAR:ls_history_revenue, ls_history_revenue_update, lv_aggregated_1, lv_aggregated_2,
+                 lv_grand, lv_last_grand.
+  ENDDO.
+ENDFORM.

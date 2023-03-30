@@ -1,0 +1,818 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI007F1_EACH_BUSINESS
+*&---------------------------------------------------------------------*
+
+FORM create_each_business.
+  DATA: lv_title TYPE string,
+        lv_col TYPE i,
+        lv_fiscper TYPE zfi007t3-fiscper,
+        lv_perio TYPE co_perio,
+        ls_zfi007t3 LIKE LINE OF gt_each_business.
+
+  CALL METHOD OF lo_application 'Sheets' = lo_worksheets .
+  CALL METHOD OF lo_worksheets 'Add' = lo_worksheet1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+  SET PROPERTY OF lo_worksheet1 'Name' = '各事業處'.
+  CALL METHOD OF lo_application 'Worksheets' = lo_worksheet1 EXPORTING #1 = 1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A'
+        #2 = 'A'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '8.36'.
+  SET PROPERTY OF lo_col 'LOCKED' = '1'.
+
+  cell:
+    lo_worksheet1 1 1 '事業處' 3 '0',
+    lo_worksheet1 2 1 '醫療' 3 '0',
+    lo_worksheet1 3 1 '骨科' 3 '0',
+    lo_worksheet1 4 1 '牙科' 3 '0',
+    lo_worksheet1 5 1 'SFR' 3 '0',
+    lo_worksheet1 6 1 '瑞鈦' 3 '0',
+    lo_worksheet1 7 1 '扣件' 3 '0',
+    lo_worksheet1 8 1 '微波' 3 '0',
+    lo_worksheet1 9 1 'TTL' 3 '0'.
+
+  lv_fiscper =  p_gjahr - 1 .
+  lv_fiscper = lv_fiscper && '012'.
+
+  SELECT SINGLE
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3
+  WHERE fiscper EQ lv_fiscper.
+
+  lv_title = lv_fiscper+0(4) && '/' && lv_fiscper+5(2).
+  PERFORM set_period_business_cell USING lv_title 2 ls_zfi007t3.
+
+  lv_col = 3.
+  DATA lv_block TYPE c.
+  DO 12 TIMES.
+    lv_perio = sy-index.
+    lv_fiscper = p_gjahr && lv_perio.
+    IF lv_block EQ ''.
+
+      SELECT SINGLE
+        *
+      FROM zfi007t3
+      INTO CORRESPONDING FIELDS OF ls_zfi007t3
+      WHERE fiscper EQ lv_fiscper.
+
+      IF sy-subrc EQ 0.
+        lv_title = lv_fiscper+0(4) && '/' && lv_fiscper+5(2).
+        PERFORM set_period_business_cell USING lv_title lv_col ls_zfi007t3.
+      ENDIF.
+      IF lv_fiscper+0(4) EQ p_gjahr
+        AND lv_fiscper+4(3) EQ p_poper.
+        lv_block = 'X'.
+      ENDIF.
+    ELSE.
+      CLEAR: ls_zfi007t3.
+      lv_title = lv_fiscper+0(4) && '/' && lv_fiscper+5(2).
+      PERFORM set_period_business_cell USING lv_title lv_col ls_zfi007t3.
+    ENDIF.
+    lv_col = lv_col + 1.
+  ENDDO.
+
+  " 計算上期差異
+  CLEAR: ls_zfi007t3.
+  DATA ls_zfi007t3_tmp LIKE ls_zfi007t3.
+
+  lv_fiscper = p_gjahr && p_poper.
+  SELECT SINGLE
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3
+  WHERE fiscper EQ lv_fiscper.
+
+  IF p_poper EQ 1.
+    lv_fiscper =  p_gjahr - 1 .
+    lv_fiscper = lv_fiscper && '012'.
+  ELSEIF p_poper NE 1.
+    lv_perio = p_poper - 1.
+    lv_fiscper = p_gjahr && lv_perio.
+  ENDIF.
+
+  SELECT SINGLE
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper EQ lv_fiscper.
+  ls_zfi007t3-income_1001 = ls_zfi007t3-income_1001 - ls_zfi007t3_tmp-income_1001.
+  ls_zfi007t3-income_1002 = ls_zfi007t3-income_1002 - ls_zfi007t3_tmp-income_1002.
+  ls_zfi007t3-income_1003 = ls_zfi007t3-income_1003 - ls_zfi007t3_tmp-income_1003.
+  ls_zfi007t3-income_1004 = ls_zfi007t3-income_1004 - ls_zfi007t3_tmp-income_1004.
+  ls_zfi007t3-income_1005 = ls_zfi007t3-income_1005 - ls_zfi007t3_tmp-income_1005.
+  ls_zfi007t3-income_1006 = ls_zfi007t3-income_1006 - ls_zfi007t3_tmp-income_1006.
+  ls_zfi007t3-income_1007 = ls_zfi007t3-income_1007 - ls_zfi007t3_tmp-income_1007.
+  ls_zfi007t3-income_1011 = ls_zfi007t3-income_1011 - ls_zfi007t3_tmp-income_1011.
+  ls_zfi007t3-income_1100 = ls_zfi007t3-income_1100 - ls_zfi007t3_tmp-income_1100.
+  ls_zfi007t3-total_income = ls_zfi007t3-total_income - ls_zfi007t3_tmp-total_income.
+
+  PERFORM last_period_difference USING ls_zfi007t3 ls_zfi007t3_tmp CHANGING lv_col.
+
+  PERFORM grand_different CHANGING lv_col.
+
+  PERFORM create_revenue_ratio CHANGING lv_col.
+
+
+ENDFORM.
+
+FORM set_period_business_cell
+  USING lv_title TYPE string
+        lv_col TYPE i
+        ls_zfi007t3 LIKE LINE OF gt_each_business.
+  DATA: lv_row TYPE i.
+
+  lv_row = 1.
+
+  IF ls_zfi007t3 IS NOT INITIAL.
+    CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+      EXPORTING
+        #1 = lv_col. " 2 = Column B
+    SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+    cell:
+      lo_worksheet1 lv_row lv_col lv_title 3 '0'.
+
+    " 依序放入各事業處金額
+    lv_row = lv_row + 1.
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1002 3 'TWD'.  " 器械
+    lv_row = lv_row + 1.
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1005 3 'TWD'.  " 植入物
+    lv_row = lv_row + 1.
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1007 3 'TWD'.  " 牙科
+    lv_row = lv_row + 1.
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1006 3 'TWD'.  " SFR
+    lv_row = lv_row + 1.
+
+   " 醫療與MIM 合併
+*    cell:
+*      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1011 3 'TWD'.  " MIM
+*    lv_row = lv_row + 1.
+
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1100 3 'TWD'.  " 瑞鈦
+    lv_row = lv_row + 1.
+
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1001 3 'TWD'.  " 扣一
+    lv_row = lv_row + 1.
+
+    "扣一與扣二 合併
+*    cell:
+*      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1004 3 'TWD'.  " 扣二
+*    lv_row = lv_row + 1.
+
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1003 3 'TWD'.  " 微波
+    lv_row = lv_row + 1.
+
+    cell:
+      lo_worksheet1 lv_row lv_col ls_zfi007t3-total_income 3 'TWD'.  " TTL(總和)
+  ELSEIF ls_zfi007t3 IS INITIAL.
+    CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+      EXPORTING
+        #1 = lv_col. " 2 = Column B
+    SET PROPERTY OF lo_cell 'Hidden' = 1.
+  ENDIF.
+ENDFORM.
+
+" 計算與上期差異
+FORM last_period_difference
+  USING ls_zfi007t3 LIKE LINE OF gt_each_business
+        ls_zfi007t3_tmp LIKE LINE OF gt_each_business
+  CHANGING lv_col TYPE i.
+  DATA: lv_row TYPE i.
+
+  lv_row = 1.
+
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col. " 2 = Column B
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  cell:
+    lo_worksheet1 lv_row lv_col '與上期差異' 3 '0'.
+
+  " 依序放入各事業處金額
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1002 3 'TWD'.  " 器械
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1005 3 'TWD'.  " 植入物
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1007 3 'TWD'.  " 牙科
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1006 3 'TWD'.  " SFR
+  lv_row = lv_row + 1.
+
+  " 醫療 與 MIM 合併
+*  cell:
+*    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1011 3 'TWD'.  " MIM
+*  lv_row = lv_row + 1.
+
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1100 3 'TWD'.  " 瑞鈦
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1001 3 'TWD'.  " 扣件
+  lv_row = lv_row + 1.
+
+  " 扣一 與 扣二 合併
+*  cell:
+*    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1004 3 'TWD'.  " 扣二
+*  lv_row = lv_row + 1.
+
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-income_1003 3 'TWD'.  " 微波
+  lv_row = lv_row + 1.
+  cell:
+    lo_worksheet1 lv_row lv_col ls_zfi007t3-total_income 3 'TWD'.  " TTL(總和)
+
+  lv_row = 1.
+  lv_col = lv_col + 1.
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col. " 2 = Column B
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  cell:
+    lo_worksheet1 lv_row lv_col '%' 3 '0'.
+  DATA lv_string_tmp TYPE string.
+  ls_zfi007t3-income_1001 = ls_zfi007t3-income_1001 / ls_zfi007t3_tmp-income_1001 * 100.
+  ls_zfi007t3-income_1002 = ls_zfi007t3-income_1002 / ls_zfi007t3_tmp-income_1002 * 100.
+  ls_zfi007t3-income_1003 = ls_zfi007t3-income_1003 / ls_zfi007t3_tmp-income_1003 * 100.
+  " 扣一與扣二合併
+*  ls_zfi007t3-income_1004 = ls_zfi007t3-income_1004 / ls_zfi007t3_tmp-income_1004 * 100.
+  ls_zfi007t3-income_1005 = ls_zfi007t3-income_1005 / ls_zfi007t3_tmp-income_1005 * 100.
+  ls_zfi007t3-income_1006 = ls_zfi007t3-income_1006 / ls_zfi007t3_tmp-income_1006 * 100.
+  ls_zfi007t3-income_1007 = ls_zfi007t3-income_1007 / ls_zfi007t3_tmp-income_1007 * 100.
+  " 醫療 與 MIM 合併
+*  ls_zfi007t3-income_1011 = ls_zfi007t3-income_1011 / ls_zfi007t3_tmp-income_1011 * 100.
+
+  IF ls_zfi007t3_tmp-income_1100 NE 0.
+    ls_zfi007t3-income_1100 = ls_zfi007t3-income_1100 / ls_zfi007t3_tmp-income_1100 * 100.
+  ELSEIF ls_zfi007t3_tmp-income_1100 EQ 0.
+    ls_zfi007t3-income_1100  = ''.
+  ENDIF.
+  ls_zfi007t3-total_income = ls_zfi007t3-total_income / ls_zfi007t3_tmp-total_income * 100.
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1002 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 器械
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1005 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 植入物
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1007 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 牙科
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1006 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " SFR
+
+  " 醫療 與 MIM 合併
+*  lv_row = lv_row + 1.
+*  lv_string_tmp = ls_zfi007t3-income_1011 && '%'.
+*  cell:
+*    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " MIM
+
+  lv_row = lv_row + 1.
+  IF ls_zfi007t3-income_1100 NE 0.
+    lv_string_tmp = ls_zfi007t3-income_1100 && '%'.
+  ELSEIF ls_zfi007t3-income_1100 EQ 0.
+    lv_string_tmp  = ''.
+  ENDIF.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 瑞鈦
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1001 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 扣一
+
+  "扣一與扣二合併
+*  lv_row = lv_row + 1.
+*  lv_string_tmp = ls_zfi007t3-income_1004 && '%'.
+*  cell:
+*    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 扣二
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-income_1003 && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " 微波
+
+  lv_row = lv_row + 1.
+  lv_string_tmp = ls_zfi007t3-total_income && '%'.
+  cell:
+    lo_worksheet1 lv_row lv_col lv_string_tmp 3 '0'.  " TTL(總和)
+
+ENDFORM.
+
+" 計算累計同期
+FORM grand_different
+  CHANGING lv_col TYPE i.
+  DATA:ls_grand_t_zfi007t3 LIKE LINE OF gt_each_business,
+        ls_grand_l_zfi007t3 LIKE LINE OF gt_each_business,
+        ls_grand_d_zfi007t3 LIKE LINE OF gt_each_business,
+        ls_zfi007t3_tmp LIKE LINE OF gt_each_business,
+        lv_row TYPE i,
+        lv_tmp_string TYPE string.
+
+  RANGES: lr_fiscper FOR ls_grand_t_zfi007t3-fiscper.
+
+  lr_fiscper-sign = 'I'.
+  lr_fiscper-option = 'BT'.
+  lr_fiscper-low =  p_gjahr && '001'.
+  lr_fiscper-high = p_gjahr && p_poper.
+  APPEND lr_fiscper.
+
+  SELECT
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper IN lr_fiscper.
+    ls_grand_t_zfi007t3-income_1001 = ls_grand_t_zfi007t3-income_1001 + ls_zfi007t3_tmp-income_1001.
+    ls_grand_t_zfi007t3-income_1002 = ls_grand_t_zfi007t3-income_1002 + ls_zfi007t3_tmp-income_1002.
+    ls_grand_t_zfi007t3-income_1003 = ls_grand_t_zfi007t3-income_1003 + ls_zfi007t3_tmp-income_1003.
+    ls_grand_t_zfi007t3-income_1004 = ls_grand_t_zfi007t3-income_1004 + ls_zfi007t3_tmp-income_1004.
+    ls_grand_t_zfi007t3-income_1005 = ls_grand_t_zfi007t3-income_1005 + ls_zfi007t3_tmp-income_1005.
+    ls_grand_t_zfi007t3-income_1006 = ls_grand_t_zfi007t3-income_1006 + ls_zfi007t3_tmp-income_1006.
+    ls_grand_t_zfi007t3-income_1007 = ls_grand_t_zfi007t3-income_1007 + ls_zfi007t3_tmp-income_1007.
+    ls_grand_t_zfi007t3-income_1011 = ls_grand_t_zfi007t3-income_1011 + ls_zfi007t3_tmp-income_1011.
+    ls_grand_t_zfi007t3-income_1100 = ls_grand_t_zfi007t3-income_1100 + ls_zfi007t3_tmp-income_1100.
+    ls_grand_t_zfi007t3-total_income = ls_grand_t_zfi007t3-total_income + ls_zfi007t3_tmp-total_income.
+  ENDSELECT.
+
+  lv_row = 1.
+  lv_col = lv_col + 1.
+
+  IF lr_fiscper-low EQ lr_fiscper-high.
+    lv_tmp_string = lr_fiscper-low+0(4) && '/' && lr_fiscper-low+5(2).
+  ELSEIF lr_fiscper-low NE lr_fiscper-high.
+    lv_tmp_string = lr_fiscper-low+0(4) && '/' && lr_fiscper-low+5(2) && '–' && lr_fiscper-high+5(2).
+  ENDIF.
+
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col.
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  cell:
+    lo_worksheet1 1 lv_col lv_tmp_string 3 '0',
+    lo_worksheet1 2 lv_col ls_grand_t_zfi007t3-income_1002 3 'TWD',  " 器械
+    lo_worksheet1 3 lv_col ls_grand_t_zfi007t3-income_1005 3 'TWD',  " 植入物
+    lo_worksheet1 4 lv_col ls_grand_t_zfi007t3-income_1007 3 'TWD',  " 牙科
+    lo_worksheet1 5 lv_col ls_grand_t_zfi007t3-income_1006 3 'TWD',  " SFR
+    lo_worksheet1 6 lv_col ls_grand_t_zfi007t3-income_1100 3 'TWD',  " 瑞鈦
+    lo_worksheet1 7 lv_col ls_grand_t_zfi007t3-income_1001 3 'TWD',  " 扣件
+    lo_worksheet1 8 lv_col ls_grand_t_zfi007t3-income_1003 3 'TWD',  " 微波
+    lo_worksheet1 9 lv_col ls_grand_t_zfi007t3-total_income 3 'TWD'.  " TTL(總和)
+
+  lv_col = lv_col + 1.
+  CLEAR: lr_fiscper.
+  FREE: lr_fiscper.
+
+  lr_fiscper-sign = 'I'.
+  lr_fiscper-option = 'BT'.
+  lr_fiscper-low =  p_gjahr - 1.
+  lr_fiscper-low =  lr_fiscper-low && '001'.
+  lr_fiscper-high =  p_gjahr - 1.
+  lr_fiscper-high = lr_fiscper-high && p_poper.
+  APPEND lr_fiscper.
+
+  SELECT
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper IN lr_fiscper.
+    ls_grand_l_zfi007t3-income_1001 = ls_grand_l_zfi007t3-income_1001 + ls_zfi007t3_tmp-income_1001.
+    ls_grand_l_zfi007t3-income_1002 = ls_grand_l_zfi007t3-income_1002 + ls_zfi007t3_tmp-income_1002.
+    ls_grand_l_zfi007t3-income_1003 = ls_grand_l_zfi007t3-income_1003 + ls_zfi007t3_tmp-income_1003.
+    ls_grand_l_zfi007t3-income_1004 = ls_grand_l_zfi007t3-income_1004 + ls_zfi007t3_tmp-income_1004.
+    ls_grand_l_zfi007t3-income_1005 = ls_grand_l_zfi007t3-income_1005 + ls_zfi007t3_tmp-income_1005.
+    ls_grand_l_zfi007t3-income_1006 = ls_grand_l_zfi007t3-income_1006 + ls_zfi007t3_tmp-income_1006.
+    ls_grand_l_zfi007t3-income_1007 = ls_grand_l_zfi007t3-income_1007 + ls_zfi007t3_tmp-income_1007.
+    ls_grand_l_zfi007t3-income_1011 = ls_grand_l_zfi007t3-income_1011 + ls_zfi007t3_tmp-income_1011.
+    ls_grand_l_zfi007t3-income_1100 = ls_grand_l_zfi007t3-income_1100 + ls_zfi007t3_tmp-income_1100.
+    ls_grand_l_zfi007t3-total_income = ls_grand_l_zfi007t3-total_income + ls_zfi007t3_tmp-total_income.
+  ENDSELECT.
+
+  IF lr_fiscper-low EQ lr_fiscper-high.
+    lv_tmp_string = lr_fiscper-low+0(4) && '/' && lr_fiscper-low+5(2).
+  ELSEIF lr_fiscper-low NE lr_fiscper-high.
+    lv_tmp_string = lr_fiscper-low+0(4) && '/' && lr_fiscper-low+5(2) && '–' && lr_fiscper-high+5(2).
+  ENDIF.
+
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col.
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  cell:
+    lo_worksheet1 1 lv_col lv_tmp_string 3 '0',
+    lo_worksheet1 2 lv_col ls_grand_l_zfi007t3-income_1002 3 'TWD',  " 器械
+    lo_worksheet1 3 lv_col ls_grand_l_zfi007t3-income_1005 3 'TWD',  " 植入物
+    lo_worksheet1 4 lv_col ls_grand_l_zfi007t3-income_1007 3 'TWD',  " 牙科
+    lo_worksheet1 5 lv_col ls_grand_l_zfi007t3-income_1006 3 'TWD',  " SFR
+    lo_worksheet1 6 lv_col ls_grand_l_zfi007t3-income_1100 3 'TWD',  " 瑞鈦
+    lo_worksheet1 7 lv_col ls_grand_l_zfi007t3-income_1001 3 'TWD',  " 扣一
+    lo_worksheet1 8 lv_col ls_grand_l_zfi007t3-income_1003 3 'TWD',  " 微波
+    lo_worksheet1 9 lv_col ls_grand_l_zfi007t3-total_income 3 'TWD'.  " TTL(總和)
+
+  lv_col = lv_col + 1.
+
+  ls_grand_d_zfi007t3-income_1001 = ls_grand_t_zfi007t3-income_1001 - ls_grand_l_zfi007t3-income_1001.
+  ls_grand_d_zfi007t3-income_1002 = ls_grand_t_zfi007t3-income_1002 - ls_grand_l_zfi007t3-income_1002.
+  ls_grand_d_zfi007t3-income_1003 = ls_grand_t_zfi007t3-income_1003 - ls_grand_l_zfi007t3-income_1003.
+  ls_grand_d_zfi007t3-income_1004 = ls_grand_t_zfi007t3-income_1004 - ls_grand_l_zfi007t3-income_1004.
+  ls_grand_d_zfi007t3-income_1005 = ls_grand_t_zfi007t3-income_1005 - ls_grand_l_zfi007t3-income_1005.
+  ls_grand_d_zfi007t3-income_1006 = ls_grand_t_zfi007t3-income_1006 - ls_grand_l_zfi007t3-income_1006.
+  ls_grand_d_zfi007t3-income_1007 = ls_grand_t_zfi007t3-income_1007 - ls_grand_l_zfi007t3-income_1007.
+  ls_grand_d_zfi007t3-income_1011 = ls_grand_t_zfi007t3-income_1011 - ls_grand_l_zfi007t3-income_1011.
+  ls_grand_d_zfi007t3-income_1100 = ls_grand_t_zfi007t3-income_1100 - ls_grand_l_zfi007t3-income_1100.
+  ls_grand_d_zfi007t3-total_income = ls_grand_t_zfi007t3-total_income - ls_grand_l_zfi007t3-total_income.
+
+  lv_tmp_string = p_gjahr - 1.
+  lv_tmp_string = p_gjahr && 'vs,' && lv_tmp_string && '同期'.
+
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col.
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '16.5'.
+
+  cell:
+    lo_worksheet1 1 lv_col lv_tmp_string 3 '0',
+    lo_worksheet1 2 lv_col ls_grand_d_zfi007t3-income_1002 3 'TWD',  " 器械
+    lo_worksheet1 3 lv_col ls_grand_d_zfi007t3-income_1005 3 'TWD',  " 植入物
+    lo_worksheet1 4 lv_col ls_grand_d_zfi007t3-income_1007 3 'TWD',  " 牙科
+    lo_worksheet1 5 lv_col ls_grand_d_zfi007t3-income_1006 3 'TWD',  " SFR
+    lo_worksheet1 6 lv_col ls_grand_d_zfi007t3-income_1100 3 'TWD',  " 瑞鈦
+    lo_worksheet1 7 lv_col ls_grand_d_zfi007t3-income_1001 3 'TWD',  " 扣件
+    lo_worksheet1 8 lv_col ls_grand_d_zfi007t3-income_1003 3 'TWD',  " 微波
+    lo_worksheet1 9 lv_col ls_grand_d_zfi007t3-total_income 3 'TWD'.  " TTL(總和)
+ENDFORM.
+
+" 計算占比
+FORM create_revenue_ratio
+  CHANGING lv_col TYPE i.
+
+  DATA: ls_zfi007t3 LIKE LINE OF gt_each_business,
+        ls_zfi007t3_tmp LIKE LINE OF gt_each_business,
+        lv_ksl LIKE ls_zfi007t3-income_1001,
+        lv_ratio TYPE i,
+        lv_row TYPE i,
+        lv_tmp_string TYPE string.
+  RANGES: lr_fiscper FOR ls_zfi007t3_tmp-fiscper.
+
+  lv_col = lv_col + 1.
+  lv_tmp_string = p_gjahr && '營收占比'.
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col. " 2 = Column B
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'T2'
+        #2 = 'T6'.
+  CALL METHOD OF lo_cell 'MERGE'.
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'T8'
+        #2 = 'T8'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  lr_fiscper-sign = 'I'.
+  lr_fiscper-option = 'BT'.
+  lr_fiscper-low =  p_gjahr && '001'.
+  lr_fiscper-high = p_gjahr && p_poper.
+  APPEND lr_fiscper.
+
+  SELECT
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper IN lr_fiscper.
+    ls_zfi007t3-income_1001 = ls_zfi007t3-income_1001 + ls_zfi007t3_tmp-income_1001.
+    ls_zfi007t3-income_1002 = ls_zfi007t3-income_1002 + ls_zfi007t3_tmp-income_1002.
+    ls_zfi007t3-income_1003 = ls_zfi007t3-income_1003 + ls_zfi007t3_tmp-income_1003.
+    "扣一與扣二合併
+*    ls_zfi007t3-income_1004 = ls_zfi007t3-income_1004 + ls_zfi007t3_tmp-income_1004.
+    ls_zfi007t3-income_1005 = ls_zfi007t3-income_1005 + ls_zfi007t3_tmp-income_1005.
+    ls_zfi007t3-income_1006 = ls_zfi007t3-income_1006 + ls_zfi007t3_tmp-income_1006.
+    ls_zfi007t3-income_1007 = ls_zfi007t3-income_1007 + ls_zfi007t3_tmp-income_1007.
+    "醫療 與 MIM 合併
+*    ls_zfi007t3-income_1011 = ls_zfi007t3-income_1011 + ls_zfi007t3_tmp-income_1011.
+    ls_zfi007t3-income_1100 = ls_zfi007t3-income_1100 + ls_zfi007t3_tmp-income_1100.
+    ls_zfi007t3-total_income = ls_zfi007t3-total_income + ls_zfi007t3_tmp-total_income.
+  ENDSELECT.
+  cell  lo_worksheet1 1 lv_col lv_tmp_string 3 '0'.
+
+  DATA: lv_total_ratio TYPE i,
+        lv_ratio_d TYPE acdoca-ksl,
+        BEGIN OF lt_dec occurs 0,
+          werks TYPE acdoca-werks,
+          dec TYPE p DECIMALS 2,
+          ratio TYPE i,
+        END OF lt_dec.
+
+  " 本年醫療事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1002 + ls_zfi007t3-income_1005
+    + ls_zfi007t3-income_1007 + ls_zfi007t3-income_1006
+    + ls_zfi007t3-income_1011 + ls_zfi007t3-income_1100.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1002'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 本年扣件事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1001 + ls_zfi007t3-income_1004.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1003'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 本年微波事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1003.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1001'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 本年TTL營收占比
+  lv_ksl = ls_zfi007t3-total_income.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 9 lv_col lv_tmp_string 1 '0'.
+
+  SORT lt_dec BY dec DESCENDING.
+  IF lv_total_ratio NE 100.
+    READ TABLE lt_dec INDEX 1.
+    IF lt_dec-werks EQ '1001'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1002'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1003'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+    ENDIF.
+  ENDIF.
+  FREE lt_dec.
+  CLEAR: lt_dec, lv_total_ratio.
+
+  FREE: lr_fiscper.
+  CLEAR: ls_zfi007t3,ls_zfi007t3_tmp, lv_ksl, lv_ratio.
+
+  " 去年營收占比
+  lv_col = lv_col + 1.
+  lv_tmp_string = p_gjahr - 1.
+  lv_tmp_string = lv_tmp_string && '營收占比'.
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col. " 2 = Column B
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'U2'
+        #2 = 'U6'.
+  CALL METHOD OF lo_cell 'MERGE'.
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'U8'
+        #2 = 'U8'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  lr_fiscper-sign = 'I'.
+  lr_fiscper-option = 'BT'.
+  lr_fiscper-low = p_gjahr - 1.
+  lr_fiscper-low =  lr_fiscper-low && '001'.
+  lr_fiscper-high = p_gjahr - 1.
+  lr_fiscper-high = lr_fiscper-high && '012'.
+  APPEND lr_fiscper.
+
+  SELECT
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper IN lr_fiscper.
+    ls_zfi007t3-income_1001 = ls_zfi007t3-income_1001 + ls_zfi007t3_tmp-income_1001.
+    ls_zfi007t3-income_1002 = ls_zfi007t3-income_1002 + ls_zfi007t3_tmp-income_1002.
+    ls_zfi007t3-income_1003 = ls_zfi007t3-income_1003 + ls_zfi007t3_tmp-income_1003.
+    ls_zfi007t3-income_1004 = ls_zfi007t3-income_1004 + ls_zfi007t3_tmp-income_1004.
+    ls_zfi007t3-income_1005 = ls_zfi007t3-income_1005 + ls_zfi007t3_tmp-income_1005.
+    ls_zfi007t3-income_1006 = ls_zfi007t3-income_1006 + ls_zfi007t3_tmp-income_1006.
+    ls_zfi007t3-income_1007 = ls_zfi007t3-income_1007 + ls_zfi007t3_tmp-income_1007.
+    ls_zfi007t3-income_1011 = ls_zfi007t3-income_1011 + ls_zfi007t3_tmp-income_1011.
+    ls_zfi007t3-income_1100 = ls_zfi007t3-income_1100 + ls_zfi007t3_tmp-income_1100.
+    ls_zfi007t3-total_income = ls_zfi007t3-total_income + ls_zfi007t3_tmp-total_income.
+  ENDSELECT.
+  cell  lo_worksheet1 1 lv_col lv_tmp_string 3 '0'.
+
+  " 去年醫療事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1002 + ls_zfi007t3-income_1005
+    + ls_zfi007t3-income_1007 + ls_zfi007t3-income_1006
+    + ls_zfi007t3-income_1011 + ls_zfi007t3-income_1100.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1002'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 去年扣件事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1001 + ls_zfi007t3-income_1004.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1001'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 去年微波事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1003.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1003'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 去年TTL營收占比
+  lv_ksl = ls_zfi007t3-total_income.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 9 lv_col lv_tmp_string 1 '0'.
+
+  SORT lt_dec BY dec DESCENDING.
+  IF lv_total_ratio NE 100.
+    READ TABLE lt_dec INDEX 1.
+    IF lt_dec-werks EQ '1001'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1002'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1003'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+    ENDIF.
+  ENDIF.
+  FREE lt_dec.
+  CLEAR: lt_dec, lv_total_ratio.
+
+  FREE: lr_fiscper.
+  CLEAR: ls_zfi007t3,ls_zfi007t3_tmp, lv_ksl, lv_ratio.
+
+  " 前年營收占比
+  lv_col = lv_col + 1.
+  lv_tmp_string = p_gjahr - 2.
+  lv_tmp_string = lv_tmp_string && '營收占比'.
+  CALL METHOD OF lo_worksheet1 'COLUMNS' = lo_cell
+    EXPORTING
+      #1 = lv_col. " 2 = Column B
+  SET PROPERTY OF lo_cell 'COLUMNWIDTH' = '15'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'V2'
+        #2 = 'V6'.
+  CALL METHOD OF lo_cell 'MERGE'.
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'V8'
+        #2 = 'V8'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  lr_fiscper-sign = 'I'.
+  lr_fiscper-option = 'BT'.
+  lr_fiscper-low = p_gjahr - 2.
+  lr_fiscper-low =  lr_fiscper-low && '001'.
+  lr_fiscper-high = p_gjahr - 2.
+  lr_fiscper-high = lr_fiscper-high && '012'.
+  APPEND lr_fiscper.
+
+  SELECT
+    *
+  FROM zfi007t3
+  INTO CORRESPONDING FIELDS OF ls_zfi007t3_tmp
+  WHERE fiscper IN lr_fiscper.
+    ls_zfi007t3-income_1001 = ls_zfi007t3-income_1001 + ls_zfi007t3_tmp-income_1001.
+    ls_zfi007t3-income_1002 = ls_zfi007t3-income_1002 + ls_zfi007t3_tmp-income_1002.
+    ls_zfi007t3-income_1003 = ls_zfi007t3-income_1003 + ls_zfi007t3_tmp-income_1003.
+    ls_zfi007t3-income_1004 = ls_zfi007t3-income_1004 + ls_zfi007t3_tmp-income_1004.
+    ls_zfi007t3-income_1005 = ls_zfi007t3-income_1005 + ls_zfi007t3_tmp-income_1005.
+    ls_zfi007t3-income_1006 = ls_zfi007t3-income_1006 + ls_zfi007t3_tmp-income_1006.
+    ls_zfi007t3-income_1007 = ls_zfi007t3-income_1007 + ls_zfi007t3_tmp-income_1007.
+    ls_zfi007t3-income_1011 = ls_zfi007t3-income_1011 + ls_zfi007t3_tmp-income_1011.
+    ls_zfi007t3-income_1100 = ls_zfi007t3-income_1100 + ls_zfi007t3_tmp-income_1100.
+    ls_zfi007t3-total_income = ls_zfi007t3-total_income + ls_zfi007t3_tmp-total_income.
+  ENDSELECT.
+  cell  lo_worksheet1 1 lv_col lv_tmp_string 3 '0'.
+
+  " 前年醫療事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1002 + ls_zfi007t3-income_1005
+    + ls_zfi007t3-income_1007 + ls_zfi007t3-income_1006
+    + ls_zfi007t3-income_1011 + ls_zfi007t3-income_1100.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1002'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 前年扣件事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1001 + ls_zfi007t3-income_1004.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1001'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 前年微波事業處營收占比
+  lv_ksl = ls_zfi007t3-income_1003.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lt_dec-werks = '1003'.
+  lt_dec-dec = ( lv_ksl / ls_zfi007t3-total_income * 100 ) mod 1.
+  lt_dec-ratio = lv_ratio.
+  APPEND lt_dec.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+  lv_total_ratio = lv_total_ratio +  lv_ratio.
+
+  " 前年TTL營收占比
+  lv_ksl = ls_zfi007t3-total_income.
+  lv_ratio = lv_ksl / ls_zfi007t3-total_income * 100.
+  lv_tmp_string = lv_ratio && '%'.
+  cell lo_worksheet1 9 lv_col lv_tmp_string 1 '0'.
+
+  SORT lt_dec BY dec DESCENDING.
+  IF lv_total_ratio NE 100.
+    READ TABLE lt_dec INDEX 1.
+    IF lt_dec-werks EQ '1001'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 7 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1002'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 2 lv_col lv_tmp_string 1 '0'.
+    ELSEIF lt_dec-werks EQ '1003'.
+      lt_dec-ratio = lt_dec-ratio + 1.
+      lv_tmp_string = lt_dec-ratio && '%'.
+      cell lo_worksheet1 8 lv_col lv_tmp_string 1 '0'.
+    ENDIF.
+  ENDIF.
+  FREE lt_dec.
+  CLEAR: lt_dec, lv_total_ratio.
+
+  FREE: lr_fiscper.
+  CLEAR: ls_zfi007t3,ls_zfi007t3_tmp, lv_ksl, lv_ratio.
+ENDFORM.

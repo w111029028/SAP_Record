@@ -1,0 +1,509 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI007F1_IS_MERGE
+*&---------------------------------------------------------------------*
+
+FORM create_is_merge_sheet.
+  CLEAR: gv_aggregated.
+  DATA lv_string_tmp TYPE string.
+  lv_string_tmp = 'IS合併_' && p_gjahr && p_poper+1(2).
+  CALL METHOD OF lo_application 'Sheets' = lo_worksheets .
+  CALL METHOD OF lo_worksheets 'Add' = lo_worksheet1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+  SET PROPERTY OF lo_worksheet1 'Name' = lv_string_tmp.
+
+  CALL METHOD OF lo_application 'Worksheets' = lo_worksheet1 EXPORTING #1 = 1.
+  CALL METHOD OF lo_worksheet1 'Activate'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A1'
+        #2 = 'A1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '11.27'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'B1'
+        #2 = 'B1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '7.27'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'C1'
+        #2 = 'C1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'D1'
+        #2 = 'D1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'E1'
+        #2 = 'E1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'F1'
+        #2 = 'F1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'G1'
+        #2 = 'G1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'H1'
+        #2 = 'H1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'I1'
+        #2 = 'I1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'J1'
+        #2 = 'J1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'K1'
+        #2 = 'K1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.45'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A1'
+        #2 = 'B1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A2'
+        #2 = 'B2'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A3'
+        #2 = 'B3'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'. "xlEdgeBottom
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet1 'Range' = lo_cell
+      EXPORTING
+        #1 = 'C10'
+        #2 = 'K10'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  cell:
+    lo_worksheet1 1 1 gv_last_day 2 '0',
+    lo_worksheet1 2 1 '平均匯率' 2 '0',
+    lo_worksheet1 2 2 gv_aver_ukurs 4 '0',
+    lo_worksheet1 3 1 '期末匯率' 2 '0',
+    lo_worksheet1 3 2 gv_end_ukurs 4 '0',
+    lo_worksheet1 4 1 '鐿鈦科技股份有限公司' 2 '0',
+    lo_worksheet1 5 3 '鐿鈦' 3 '0',
+    lo_worksheet1 5 4 '瑞鈦' 3 '0',
+    lo_worksheet1 5 5 'AOLTEC-US' 3 '0',
+    lo_worksheet1 5 6 'AOLTEC' 3 '0',
+    lo_worksheet1 5 7 'EG-US' 3 '0',
+    lo_worksheet1 5 8 'EG' 3 '0',
+    lo_worksheet1 5 9 'Aggregated' 3 '0',
+    lo_worksheet1 5 10 'EJE' 3 '0',
+    lo_worksheet1 5 11 gv_last_day 3 '0',
+    lo_worksheet1 7 1 '營業收入總額' 2 '0',
+    lo_worksheet1 8 1 '銷貨退回' 4 '0',
+    lo_worksheet1 9 1 '銷貨折讓' 4 '0',
+    lo_worksheet1 11 1 '銷貨淨額' 4 '0'.
+
+  " 取資料
+  PERFORM is_merge_get_data.
+
+  " 放入收入總額資料
+  DATA lv_field TYPE i.
+  lv_field = 3.
+  LOOP AT gt_total_income.
+    IF gt_total_income-waers EQ 'USD'.
+      IF gt_total_income-tsl IS NOT INITIAL.
+        cell lo_worksheet1 7 lv_field gt_total_income-tsl 4 'USD' .
+      ENDIF.
+      lv_field = lv_field + 1.
+      IF gt_total_income-ksl IS NOT INITIAL.
+        cell lo_worksheet1 7 lv_field gt_total_income-ksl 4 'TWD' .
+      ENDIF.
+      gv_aggregated = gv_aggregated + gt_total_income-ksl.
+    ELSEIF gt_total_income-waers EQ 'TWD'.
+      cell lo_worksheet1 7 lv_field gt_total_income-tsl 4 'TWD'.
+      IF gt_total_income-tsl IS NOT INITIAL.
+        gv_aggregated = gv_aggregated + gt_total_income-tsl.
+      ENDIF.
+    ENDIF.
+    lv_field = lv_field + 1.
+  ENDLOOP.
+
+  CALL FUNCTION 'ROUND'
+    EXPORTING
+      decimals      = 0
+      input         = gv_evaluat_ksl
+      sign          = 'X'
+    IMPORTING
+      output        = gv_evaluat_ksl
+    EXCEPTIONS
+      input_invalid = 1
+      overflow      = 2
+      type_invalid  = 3
+      OTHERS        = 4.
+
+  gv_sale = gv_aggregated - gv_evaluat_ksl.
+  cell:
+    lo_worksheet1 7 9 gv_aggregated 4 'TWD' ,
+    lo_worksheet1 7 10 gv_evaluat_ksl 4 'TWD',
+    lo_worksheet1 7 11 gv_sale 4 'TWD'.
+
+  " 放入 銷售退回資料
+  lv_field = 3.
+  LOOP AT gt_total_return.
+    IF gt_total_return-waers EQ 'USD'.
+      IF gt_total_return-tsl IS NOT INITIAL.
+        cell lo_worksheet1 8 lv_field gt_total_return-tsl 4 'USD' .
+      ENDIF.
+      lv_field = lv_field + 1.
+      IF gt_total_return-ksl IS NOT INITIAL.
+        gt_total_return-ksl = gt_total_return-tsl * gv_aver_ukurs.
+        CALL FUNCTION 'ROUND'
+          EXPORTING
+            decimals      = 0
+            input         = gt_total_return-ksl
+            sign          = 'X'
+          IMPORTING
+            output        = gt_total_return-ksl
+          EXCEPTIONS
+            input_invalid = 1
+            overflow      = 2
+            type_invalid  = 3
+            OTHERS        = 4.
+        cell lo_worksheet1 8 lv_field gt_total_return-ksl 4 'TWD' .
+      ENDIF.
+      gv_return_aggregated  = gv_return_aggregated  + gt_total_return-ksl.
+    ELSEIF gt_total_return-waers EQ 'TWD'.
+      cell lo_worksheet1 8 lv_field gt_total_return-ksl 4 'TWD'.
+      IF gt_total_return-ksl IS NOT INITIAL.
+        gv_return_aggregated  = gv_return_aggregated  + gt_total_return-ksl.
+      ENDIF.
+    ENDIF.
+    lv_field = lv_field + 1.
+  ENDLOOP.
+  cell:
+    lo_worksheet1 8 9 gv_return_aggregated  4 'TWD' ,
+    lo_worksheet1 8 11 gv_return_aggregated 4 'TWD'.
+
+  " 放入 銷售折讓資料
+  lv_field = 3.
+  LOOP AT gt_total_discount.
+    IF gt_total_discount-waers EQ 'USD'.
+      IF gt_total_discount-tsl IS NOT INITIAL.
+        cell lo_worksheet1 9 lv_field gt_total_discount-tsl 4 'USD' .
+      ENDIF.
+      lv_field = lv_field + 1.
+      IF gt_total_discount-ksl IS NOT INITIAL.
+        gt_total_discount-ksl = gt_total_discount-tsl * gv_aver_ukurs.
+        CALL FUNCTION 'ROUND'
+          EXPORTING
+            decimals      = 0
+            input         = gt_total_discount-ksl
+            sign          = 'X'
+          IMPORTING
+            output        = gt_total_discount-ksl
+          EXCEPTIONS
+            input_invalid = 1
+            overflow      = 2
+            type_invalid  = 3
+            OTHERS        = 4.
+        cell lo_worksheet1 9 lv_field gt_total_discount-ksl 4 'TWD' .
+      ENDIF.
+      gv_discount_aggregated  = gv_discount_aggregated + gt_total_discount-ksl.
+    ELSEIF gt_total_discount-waers EQ 'TWD'.
+      cell lo_worksheet1 9 lv_field gt_total_discount-ksl 4 'TWD'.
+      IF gt_total_discount-ksl IS NOT INITIAL.
+        gv_discount_aggregated  = gv_discount_aggregated  + gt_total_discount-ksl.
+      ENDIF.
+    ENDIF.
+    lv_field = lv_field + 1.
+  ENDLOOP.
+  CALL FUNCTION 'ROUND'
+    EXPORTING
+      decimals      = 0
+      input         = gv_discount_aggregated
+      sign          = 'X'
+    IMPORTING
+      output        = gv_discount_aggregated
+    EXCEPTIONS
+      input_invalid = 1
+      overflow      = 2
+      type_invalid  = 3
+      OTHERS        = 4.
+
+  cell:
+    lo_worksheet1 9 9 gv_discount_aggregated  4 'TWD' ,
+    lo_worksheet1 9 11 gv_discount_aggregated 4 'TWD'.
+
+  lv_field = 3.
+  LOOP AT gt_net_price.
+    IF gt_net_price-waers EQ 'USD'.
+      IF gt_net_price-tsl IS NOT INITIAL.
+        cell lo_worksheet1 11 lv_field gt_net_price-tsl 4 'USD' .
+      ENDIF.
+      lv_field = lv_field + 1.
+      IF gt_net_price-ksl IS NOT INITIAL.
+        cell lo_worksheet1 11 lv_field gt_net_price-ksl 4 'TWD' .
+      ENDIF.
+    ELSEIF gt_net_price-waers EQ 'TWD'.
+      cell lo_worksheet1 11 lv_field gt_net_price-tsl 4 'TWD'.
+      IF gt_net_price-tsl IS NOT INITIAL.
+      ENDIF.
+    ENDIF.
+    lv_field = lv_field + 1.
+  ENDLOOP.
+  gv_aggregated = gv_aggregated - gv_aggregated_reduce.
+  cell lo_worksheet1 11 9 gv_aggregated  4 'TWD'.
+  cell lo_worksheet1 11 10 gv_evaluat_ksl  4 'TWD'.
+  gv_aggregated = gv_aggregated - gv_evaluat_ksl.
+  cell lo_worksheet1 11 11 gv_aggregated 4 'TWD'.
+  gs_each_business-total_income = gv_aggregated.
+ENDFORM.
+
+FORM is_merge_get_data.
+  DATA:
+    lv_tsl    TYPE acdoca-tsl,
+    lv_ksl    TYPE acdoca-ksl,
+    lv_result TYPE p DECIMALS 2.
+
+  RANGES: lr_racct FOR acdoca-racct.
+
+  SELECT
+    *
+  FROM t001
+  INTO @DATA(gs_bukrs)
+  WHERE ktopl EQ 'ITT0'
+    AND bukrs NE '8888'.
+
+    CLEAR: lv_tsl, lv_ksl.
+
+    " 取營業收入
+    FREE: lr_racct.
+    CLEAR: lr_racct.
+    lr_racct-sign = 'I'.
+    lr_racct-option = 'CP'.
+    lr_racct-low = '004111*'.
+    APPEND lr_racct.
+
+    SELECT
+      *
+    FROM acdoca
+    INTO @DATA(gs_income)
+    WHERE rbukrs EQ @gs_bukrs-bukrs
+      AND gjahr EQ @p_gjahr
+      AND poper EQ @p_poper
+      AND racct IN @lr_racct.
+      lv_tsl = lv_tsl + gs_income-tsl.
+      lv_ksl = lv_ksl + gs_income-ksl.
+    ENDSELECT.
+    CLEAR lv_result.
+    lv_tsl = |{ lv_tsl CURRENCY = gs_income-rtcur }|.
+    lv_ksl = |{ lv_ksl CURRENCY = gs_income-rkcur }|.
+    gt_total_income-bukrs = gs_bukrs-bukrs.
+    gt_total_income-waers = gs_bukrs-waers.
+
+    lv_result = lv_tsl.
+    lv_tsl = abs( lv_result ).
+    lv_result = lv_ksl.
+    lv_ksl = abs( lv_result ).
+
+    IF gs_bukrs-waers EQ 'TWD'.
+      gt_total_income-tsl = lv_ksl.
+    ELSEIF gs_bukrs-waers EQ 'USD'.
+      gt_total_income-tsl = lv_tsl.
+      gt_total_income-ksl = lv_tsl * gv_aver_ukurs.
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = gt_total_income-ksl
+          sign          = 'X'
+        IMPORTING
+          output        = gt_total_income-ksl
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+    ENDIF.
+    APPEND gt_total_income.
+    CLEAR gt_total_income.
+
+    "取銷售退回
+    FREE: lr_racct.
+    CLEAR: lr_racct.
+    lr_racct-sign = 'I'.
+    lr_racct-option = 'BT'.
+    lr_racct-low = '0041700001'.
+    lr_racct-high = '0041700002'.
+    APPEND lr_racct.
+
+    SELECT
+      *
+    FROM acdoca
+    INTO @DATA(gs_sale_return)
+    WHERE rbukrs EQ @gs_bukrs-bukrs
+      AND gjahr EQ @p_gjahr
+      AND poper EQ @p_poper
+      AND racct IN @lr_racct.
+      gt_total_return-tsl = gt_total_return-tsl + gs_sale_return-tsl.
+      gt_total_return-ksl = gt_total_return-ksl + gs_sale_return-ksl.
+    ENDSELECT.
+    gt_total_return-tsl = |{ gt_total_return-tsl CURRENCY = gs_sale_return-rtcur }|.
+    gt_total_return-ksl = |{ gt_total_return-ksl CURRENCY = gs_sale_return-rkcur }|.
+    gt_total_return-bukrs = gs_bukrs-bukrs.
+    gt_total_return-waers = gs_bukrs-waers.
+    APPEND gt_total_return.
+    CLEAR: gt_total_return.
+
+    "取銷售折讓
+    FREE: lr_racct.
+    CLEAR: lr_racct.
+    lr_racct-sign = 'I'.
+    lr_racct-option = 'BT'.
+    lr_racct-low = '0041900001'.
+    lr_racct-high = '0041900002'.
+    APPEND lr_racct.
+
+    SELECT
+      *
+    FROM acdoca
+    INTO @DATA(gs_sale_discount)
+    WHERE rbukrs EQ @gs_bukrs-bukrs
+      AND gjahr EQ @p_gjahr
+      AND poper EQ @p_poper
+      AND racct IN @lr_racct.
+      gt_total_discount-tsl = gt_total_discount-tsl + gs_sale_discount-tsl.
+      gt_total_discount-ksl = gt_total_discount-ksl + gs_sale_discount-ksl.
+    ENDSELECT.
+    gt_total_discount-tsl = |{ gt_total_discount-tsl CURRENCY = gs_sale_discount-rtcur }|.
+    gt_total_discount-ksl = |{ gt_total_discount-ksl CURRENCY = gs_sale_discount-rkcur }|.
+    gt_total_discount-bukrs = gs_bukrs-bukrs.
+    gt_total_discount-waers = gs_bukrs-waers.
+    APPEND gt_total_discount.
+    CLEAR: gt_total_discount.
+  ENDSELECT.
+
+  " 計算銷售淨值
+  LOOP AT gt_total_income.
+    gt_net_price-bukrs = gt_total_income-bukrs.
+    gt_net_price-waers = gt_total_income-waers.
+    gt_net_price-tsl = gt_total_income-tsl.
+    IF gt_net_price-waers EQ 'USD'.
+      gt_net_price-ksl = gt_net_price-tsl * gv_aver_ukurs.
+      CALL FUNCTION 'ROUND'
+        EXPORTING
+          decimals      = 0
+          input         = gt_net_price-ksl
+          sign          = 'X'
+        IMPORTING
+          output        = gt_net_price-ksl
+        EXCEPTIONS
+          input_invalid = 1
+          overflow      = 2
+          type_invalid  = 3
+          OTHERS        = 4.
+    ENDIF.
+    READ TABLE gt_total_return WITH KEY bukrs = gt_total_income-bukrs.
+    IF sy-subrc = 0.
+      IF gt_total_return-waers EQ 'TWD'.
+        gt_net_price-tsl = gt_net_price-tsl - gt_total_return-ksl.
+        gv_aggregated_reduce = gv_aggregated_reduce + gt_total_return-ksl.
+      ELSEIF gt_total_return-waers EQ 'USD'.
+        gt_net_price-tsl = gt_net_price-tsl - gt_total_return-tsl.
+        gt_total_return-ksl = gt_total_return-tsl * gv_aver_ukurs.
+        CALL FUNCTION 'ROUND'
+          EXPORTING
+            decimals      = 0
+            input         = gt_total_return-ksl
+            sign          = 'X'
+          IMPORTING
+            output        = gt_total_return-ksl
+          EXCEPTIONS
+            input_invalid = 1
+            overflow      = 2
+            type_invalid  = 3
+            OTHERS        = 4.
+        gt_net_price-ksl = gt_net_price-ksl - gt_total_return-ksl.
+        gv_aggregated_reduce = gv_aggregated_reduce + gt_total_return-ksl.
+      ENDIF.
+    ENDIF.
+
+    READ TABLE gt_total_discount WITH KEY bukrs = gt_total_income-bukrs.
+    IF sy-subrc = 0.
+      IF gt_total_discount-waers EQ 'TWD'.
+        gt_net_price-tsl = gt_net_price-tsl - gt_total_discount-ksl.
+        gv_aggregated_reduce = gv_aggregated_reduce + gt_total_discount-ksl.
+      ELSEIF gt_total_discount-waers EQ 'USD'.
+        gt_net_price-tsl = gt_net_price-tsl - gt_total_discount-tsl.
+        gt_total_discount-ksl = gt_total_discount-tsl * gv_aver_ukurs.
+        CALL FUNCTION 'ROUND'
+          EXPORTING
+            decimals      = 0
+            input         = gt_total_discount-ksl
+            sign          = 'X'
+          IMPORTING
+            output        = gt_total_discount-ksl
+          EXCEPTIONS
+            input_invalid = 1
+            overflow      = 2
+            type_invalid  = 3
+            OTHERS        = 4.
+        gt_net_price-ksl = gt_net_price-ksl - gt_total_discount-ksl.
+        gv_aggregated_reduce = gv_aggregated_reduce + gt_total_discount-ksl.
+        CALL FUNCTION 'ROUND'
+          EXPORTING
+            decimals      = 0
+            input         = gv_aggregated_reduce
+            sign          = 'X'
+          IMPORTING
+            output        = gv_aggregated_reduce
+          EXCEPTIONS
+            input_invalid = 1
+            overflow      = 2
+            type_invalid  = 3
+            OTHERS        = 4.
+      ENDIF.
+    ENDIF.
+    APPEND gt_net_price.
+    CLEAR gt_net_price.
+  ENDLOOP.
+
+ENDFORM.

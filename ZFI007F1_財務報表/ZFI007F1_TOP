@@ -1,0 +1,154 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI007F1_TOP
+*&---------------------------------------------------------------------*
+
+TYPE-POOLS: soi, ole2.
+
+
+"  OLE 參數
+DATA:
+  lo_application TYPE  ole2_object,
+  lo_workbook    TYPE  ole2_object,
+  lo_workbooks   TYPE  ole2_object,
+  lo_range       TYPE  ole2_object,
+  lo_worksheet   TYPE  ole2_object,
+  lo_worksheets  TYPE  ole2_object,
+  lo_worksheet1  TYPE  ole2_object,
+  lo_worksheets1 TYPE  ole2_object,
+  lo_column      TYPE  ole2_object,
+  lo_row         TYPE  ole2_object,
+  lo_cell        TYPE  ole2_object,
+  lo_col         TYPE ole2_object,
+  lo_borders     TYPE ole2_object,
+  lo_int         TYPE ole2_object,
+  lo_font        TYPE ole2_object.
+
+DATA: lo_cellstart  TYPE ole2_object,
+      lo_cellend    TYPE ole2_object,
+      lo_selection  TYPE ole2_object,
+      lo_validation TYPE ole2_object.
+
+DATA:
+  lv_complete_path TYPE char256,
+  lv_titulo        TYPE string.
+
+DATA: lv_tmp_value TYPE string,
+      lv_tmp_integer TYPE i.
+
+" OLE  Excel 表格輸入
+DEFINE cell.
+  CALL METHOD OF &1 'Cells' = lo_cell
+    EXPORTING
+      #1 = &2
+      #2 = &3.
+  SET PROPERTY OF lo_cell 'Value' = &4.
+  SET PROPERTY OF lo_cell 'HorizontalAlignment' = &5.
+  IF &6 EQ 'USD'.
+    IF &4 < 0 .
+      lv_tmp_integer = &4.
+      lv_tmp_integer = lv_tmp_integer * -1.
+      SET PROPERTY OF lo_cell 'Value' = lv_tmp_integer.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '(0,000.00)'.
+      GET PROPERTY OF lo_cell 'FONT' = lo_font.
+      SET PROPERTY OF lo_font 'ColorIndex' = 3.
+    ELSEIF &4 > 0.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '0,000.00'.
+    ENDIF.
+  ELSEIF &6 EQ 'TWD'.
+    IF &4 < 0 .
+      lv_tmp_integer = &4.
+      lv_tmp_integer = lv_tmp_integer * -1.
+      SET PROPERTY OF lo_cell 'Value' = lv_tmp_integer.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '(0,000)'.
+      GET PROPERTY OF lo_cell 'FONT' = lo_font.
+      SET PROPERTY OF lo_font 'ColorIndex' = 3.
+    ELSEIF &4 > 0.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '0,000'.
+    ENDIF.
+  ENDIF.
+END-OF-DEFINITION.
+
+DEFINE columns_format.
+
+END-OF-DEFINITION.
+
+
+DATA:
+  BEGIN OF gt_writeoff OCCURS 0,   " 沖銷分錄
+    bukrs  TYPE bseg-bukrs,
+    explan TYPE zfi007t1-explan,
+    hkont  TYPE zfi007t1-hkont,
+    tsl    TYPE acdoca-tsl,
+    rtcur  TYPE acdoca-rtcur,
+    gkont  TYPE zfi007t1-gkont,
+    ksl    TYPE acdoca-ksl,
+    rkcur  TYPE acdoca-rkcur,
+    is_negative TYPE c,
+    picklow TYPE c,
+  END OF gt_writeoff,
+  BEGIN OF gt_alv OCCURS 0,
+    sgtxt TYPE zfi007t1-explan,
+    tsl1  TYPE acdoca-tsl,
+    tsl2  TYPE acdoca-tsl,
+    ksl1  TYPE acdoca-ksl,
+    ksl2  TYPE acdoca-ksl,
+    is_negative TYPE c,
+    picklow TYPE c,
+  END OF gt_alv,
+  BEGIN OF gt_total_income OCCURS 0,
+    bukrs TYPE acdoca-rbukrs,
+    waers TYPE t001-waers,
+    tsl   TYPE acdoca-tsl,
+    ksl   TYPE zzksl,
+  END OF gt_total_income,
+  BEGIN OF gt_total_return OCCURS 0,
+    bukrs TYPE acdoca-rbukrs,
+    waers TYPE t001-waers,
+    tsl   TYPE acdoca-tsl,
+    ksl   TYPE acdoca-ksl,
+  END OF gt_total_return,
+  BEGIN OF gt_total_discount OCCURS 0,
+    bukrs TYPE acdoca-rbukrs,
+    waers TYPE t001-waers,
+    tsl   TYPE acdoca-tsl,
+    ksl   TYPE acdoca-ksl,
+  END OF gt_total_discount,
+  BEGIN OF gt_net_price OCCURS 0,
+    bukrs TYPE acdoca-rbukrs,
+    waers TYPE t001-waers,
+    tsl   TYPE acdoca-tsl,
+    ksl   TYPE zzksl,
+  END OF gt_net_price,
+  gv_last_day            TYPE sy-datum,
+  gv_tsl                 TYPE acdoca-tsl,
+  gv_ksl                 TYPE acdoca-ksl,
+  gv_aver_ukurs          TYPE tcurr-ukurs,
+  gv_end_ukurs           TYPE tcurr-ukurs,
+  gv_evaluat_ksl         TYPE acdoca-ksl,
+  gv_aggregated          TYPE acdoca-ksl,
+  gv_aggregated_reduce   TYPE acdoca-ksl,
+  gv_return_aggregated   TYPE acdoca-ksl,
+  gv_discount_aggregated TYPE acdoca-ksl,
+  gv_sale                TYPE acdoca-ksl,
+  gt_each_business TYPE STANDARD TABLE OF zfi007t3,
+  gs_each_business TYPE zfi007t3.
+
+CONSTANTS: gc_classname TYPE sbdst_classname VALUE 'HRFPM_EXCEL_STANDARD',
+           gc_classtype TYPE sbdst_classtype  VALUE 'OT',
+           gc_objkey    TYPE sbdst_object_key VALUE 'ZREPORT'.
+DATA: gv_desc TYPE char255.
+DATA: gs_ranges TYPE soi_range_item,
+      gt_ranges TYPE soi_range_list,
+      gs_input  TYPE soi_generic_item,
+      gt_input  TYPE soi_generic_table.
+DATA: gt_doc_components TYPE sbdst_components.
+
+DATA: r_document  TYPE REF TO cl_bds_document_set,
+      r_excel     TYPE REF TO i_oi_spreadsheet,
+      r_container TYPE REF TO cl_gui_custom_container,
+      r_control   TYPE REF TO i_oi_container_control,
+      r_proxy     TYPE REF TO i_oi_document_proxy,
+      r_error     TYPE REF TO i_oi_error,
+      wf_retcode  TYPE soi_ret_string.
+
+DATA: g_error TYPE c LENGTH 1 .

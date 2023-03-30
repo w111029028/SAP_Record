@@ -1,0 +1,449 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI007F1_REVERSING_ENTRY
+*&---------------------------------------------------------------------*
+
+FORM create_reversing_entry_sheet.
+
+  DATA: lv_rassc          TYPE acdoca-rassc,
+        lv_pur_wsl        TYPE acdoca-wsl,
+        lv_pur_ksl        TYPE acdoca-ksl,
+        lv_pur_gap_wsl    TYPE acdoca-wsl,
+        lv_pur_gap_ksl    TYPE acdoca-ksl,
+        lv_cost_wsl       TYPE acdoca-wsl,
+        lv_cost_ksl       TYPE acdoca-ksl,
+        lv_tran_stock_wsl TYPE acdoca-wsl,
+        lv_tran_stock_ksl TYPE acdoca-ksl.
+
+  GET PROPERTY OF lo_application 'ACTIVESHEET' = lo_worksheet.
+  SET PROPERTY OF lo_worksheet 'Name' = '沖銷分錄'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'D5'
+        #2 = 'F5'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'H5'
+        #2 = 'J5'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  " Set 欄位寬度
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'A1'
+        #2 = 'A1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '3.73'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'B1'
+        #2 = 'B1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '22.73'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'C1'
+        #2 = 'C1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '0.83'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'D1'
+        #2 = 'D1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '17.27'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'E1'
+        #2 = 'E1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '0.83'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'F1'
+        #2 = 'F1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '17.27'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'G1'
+        #2 = 'G1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '0.83'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'H1'
+        #2 = 'H1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '17.27'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'I1'
+        #2 = 'I1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '0.83'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'J1'
+        #2 = 'J1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '17.27'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'K1'
+        #2 = 'K1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '17.27'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'J1'
+        #2 = 'K1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'J2'
+        #2 = 'K2'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+      EXPORTING
+        #1 = 'J3'
+        #2 = 'K3'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'. "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'. "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'. "xlEdgeBottom
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  " 輸入表頭資訊
+  cell:
+     lo_worksheet 1 2 '鐿鈦科技股份有限公司' 2 '0',
+     lo_worksheet 1 10 gv_last_day 2 '0',
+     lo_worksheet 2 2 '沖銷分錄' 2 '0',
+     lo_worksheet 2 10 '平均匯率' 1 '0',
+     lo_worksheet 2 11 gv_aver_ukurs 4 '0',
+     lo_worksheet 3 10 '期末匯率' 1 '0',
+     lo_worksheet 3 11 gv_end_ukurs 4 '0',
+     lo_worksheet 4 2 gv_last_day 2 '0',
+     lo_worksheet 5 4 'USD' 3 '0',
+     lo_worksheet 5 8 '線上NTD' 3 '0',
+     lo_worksheet 5 11 '評價後NTD' 2 '0'.
+
+  SELECT
+    bukrs
+    FROM t001
+    INTO TABLE @DATA(gt_bukrs)
+    WHERE ktopl EQ 'ITT0'.
+
+  " 抓取沖銷金額
+  LOOP AT gt_bukrs ASSIGNING FIELD-SYMBOL(<fs_bukrs>).
+    CLEAR: lv_pur_wsl, lv_pur_ksl,
+          lv_pur_gap_wsl, lv_pur_gap_ksl,
+          lv_cost_wsl, lv_cost_ksl.
+
+    SELECT
+      *
+    FROM zfi007t1
+    INTO @DATA(gs_bukrs)
+    WHERE bukrs EQ @<fs_bukrs>-bukrs.
+      CLEAR: gv_tsl,gv_ksl.
+      "  USD
+      SELECT
+        *
+      FROM acdoca
+      INTO @DATA(gs_usd)
+      WHERE gjahr EQ @p_gjahr
+        AND poper EQ @p_poper
+        AND rbukrs EQ @gs_bukrs-bukrs
+        AND ( racct EQ '0041110001'
+         OR racct EQ '0041700001'
+         OR racct EQ '0041700002'
+         OR racct EQ '0041900001'
+         OR racct EQ '0041900002' )
+        AND rassc EQ @gs_bukrs-rassc.
+*        IF ( gs_usd-racct EQ '0041700001' OR gs_usd-racct EQ '0041700002'
+*          OR gs_usd-racct EQ '0041900001' OR gs_usd-racct EQ '0041900002' )
+*          AND ( gs_bukrs-bukrs EQ '1000' AND gs_bukrs-rassc EQ '001100' ).
+*          gs_usd-tsl = gs_usd-tsl * -1.
+*          gs_usd-ksl = gs_usd-ksl * -1.
+*        ENDIF.
+        gv_tsl = gv_tsl + gs_usd-tsl.
+        gv_ksl = gv_ksl + gs_usd-ksl.
+      ENDSELECT.
+      " 線上TWD
+      IF gs_bukrs-ispur EQ 'X'.
+
+        lv_rassc = '00' && gs_bukrs-bukrs.
+
+        SELECT
+          *
+        FROM acdoca
+        INTO @DATA(gs_pur)
+        WHERE gjahr EQ @p_gjahr
+          AND poper EQ @p_poper
+          AND rbukrs EQ @gs_bukrs-rassc+2(4)
+          AND racct EQ '0021720001'
+          AND rassc EQ @lv_rassc
+          AND blart EQ 'ZB'
+          AND vorgn EQ 'RMRP'.
+
+          lv_pur_wsl = lv_pur_wsl + gs_pur-wsl.
+          lv_pur_ksl = lv_pur_ksl + gs_pur-ksl.
+        ENDSELECT.
+
+        lv_pur_wsl = |{ lv_pur_wsl CURRENCY = gs_pur-rwcur }|.
+        lv_pur_ksl = |{ lv_pur_ksl CURRENCY = gs_pur-rkcur }|.
+
+        RANGES:
+          lr_racct FOR acdoca-racct.
+
+        lr_racct-sign = 'I'.
+        lr_racct-option = 'CP'.
+        lr_racct-low = '005511001*'.
+        APPEND lr_racct.
+
+        SELECT
+          *
+          FROM acdoca
+          INTO @DATA(gs_pur_gap)
+          WHERE gjahr EQ @p_gjahr
+            AND poper EQ @p_poper
+            AND rbukrs EQ @gs_bukrs-rassc+2(4)
+            AND racct IN @lr_racct
+            AND rassc EQ @lv_rassc
+            AND blart EQ 'ZB'
+            AND vorgn EQ 'RMRP'.
+          lv_pur_gap_wsl = lv_pur_gap_wsl + gs_pur_gap-wsl.
+          lv_pur_gap_ksl = lv_pur_gap_ksl + gs_pur_gap-ksl.
+        ENDSELECT.
+        lv_pur_gap_wsl = |{ lv_pur_gap_wsl CURRENCY = gs_pur_gap-rwcur }|.
+        lv_pur_gap_ksl = |{ lv_pur_gap_ksl CURRENCY = gs_pur_gap-rkcur }|.
+
+
+        " 計算費用類科目：0061110001 ~ 0061880005
+        " 沖銷科目： 2002、2902
+        " 文件類型：AB、RE
+        " 費用類若文件日期和過帳日期在同一個月份，則表示當月即認列為費用
+        " 若在不同月份，則表示有經過在途存貨會科再轉列為費用
+        CLEAR: lr_racct.
+        FREE: lr_racct.
+        lr_racct-sign = 'I'.
+        lr_racct-option = 'BT'.
+        lr_racct-low = '0061110001'.
+        lr_racct-high = '0061880005'.
+        APPEND lr_racct.
+
+        SELECT
+          *
+        FROM acdoca
+        INTO @DATA(gs_cost)
+        WHERE gjahr EQ @p_gjahr
+          AND poper EQ @p_poper
+          AND rbukrs EQ @gs_bukrs-rassc+2(4)
+          AND racct IN @lr_racct
+          AND rassc EQ @lv_rassc
+          AND ( blart EQ 'AB'
+               OR blart EQ 'RE' )
+          AND xreversing NE 'X'
+          AND xreversed NE 'X'
+          AND xtruerev NE 'X'.
+          "IF gs_cost-bldat+0(6) EQ gs_cost-budat+0(6).
+          lv_cost_wsl = lv_cost_wsl + gs_cost-wsl.
+          lv_cost_ksl = lv_cost_ksl + gs_cost-ksl.
+          "ENDIF.
+        ENDSELECT.
+        lv_cost_wsl = |{ lv_cost_wsl CURRENCY = gs_cost-rwcur }|.
+        lv_cost_ksl = |{ lv_cost_ksl CURRENCY = gs_cost-rkcur }|.
+
+        " 計算在途庫存科目：0013180001
+        " 沖銷科目： 2002、2902
+        " 文件類型：SA
+        CLEAR: lr_racct.
+        FREE: lr_racct.
+        lr_racct-sign = 'I'.
+        lr_racct-option = 'EQ'.
+        lr_racct-low = '0013180001'.
+        APPEND lr_racct.
+
+        SELECT
+          *
+        FROM acdoca
+        INTO @DATA(gs_tran_stock)
+        WHERE gjahr EQ @p_gjahr
+          AND poper EQ @p_poper
+          AND rbukrs EQ @gs_bukrs-rassc+2(4)
+          AND racct IN @lr_racct
+          AND rassc EQ @lv_rassc
+          AND blart EQ 'SA'.
+          lv_tran_stock_wsl = lv_tran_stock_wsl + gs_tran_stock-wsl.
+          lv_tran_stock_ksl = lv_tran_stock_ksl + gs_tran_stock-ksl.
+        ENDSELECT.
+        lv_tran_stock_wsl = |{ lv_tran_stock_wsl CURRENCY = gs_tran_stock-rwcur }|.
+        lv_tran_stock_ksl = |{ lv_tran_stock_ksl CURRENCY = gs_tran_stock-rkcur }|.
+      ENDIF.
+
+      APPEND INITIAL LINE TO gt_writeoff ASSIGNING FIELD-SYMBOL(<fs_writeoff>).
+      <fs_writeoff>-bukrs = <fs_bukrs>-bukrs.
+      <fs_writeoff>-hkont = gs_bukrs-hkont.
+      <fs_writeoff>-tsl = |{ gv_tsl CURRENCY = gs_usd-rtcur }|.
+      <fs_writeoff>-rtcur = gs_usd-rtcur.
+      <fs_writeoff>-gkont = gs_bukrs-gkont.
+      <fs_writeoff>-picklow = gs_bukrs-picklow.
+      IF gs_bukrs-ispur EQ 'X'.
+        <fs_writeoff>-ksl = lv_pur_ksl + lv_pur_gap_ksl + lv_cost_ksl + lv_tran_stock_ksl.
+      ELSE.
+        <fs_writeoff>-ksl = |{ gv_ksl CURRENCY = gs_usd-rkcur }|.
+      ENDIF.
+      <fs_writeoff>-rkcur = gs_usd-rkcur.
+      IF gs_bukrs-bukrs EQ '1000' AND gs_bukrs-rassc EQ '001100'.
+        <fs_writeoff>-is_negative = 'X'.
+      ENDIF.
+      <fs_writeoff>-explan = gs_bukrs-explan.
+      CLEAR: gs_usd, gs_usd, gs_bukrs.
+    ENDSELECT.
+  ENDLOOP.
+
+  LOOP AT gt_writeoff INTO gt_writeoff.
+    " Header
+    APPEND INITIAL LINE TO gt_alv ASSIGNING FIELD-SYMBOL(<fs_alv_1>).
+    IF gt_writeoff-is_negative EQ 'X'.
+      <fs_alv_1>-is_negative = 'X'.
+    ENDIF.
+    <fs_alv_1>-sgtxt = gt_writeoff-explan.
+    <fs_alv_1>-picklow = gt_writeoff-picklow.
+    " 借項
+
+    APPEND INITIAL LINE TO gt_alv ASSIGNING FIELD-SYMBOL(<fs_alv_2>).
+    <fs_alv_2>-sgtxt = gt_writeoff-hkont.
+    <fs_alv_2>-picklow = gt_writeoff-picklow.
+    IF gt_writeoff-rtcur EQ 'USD'.
+      <fs_alv_2>-tsl1 = gt_writeoff-tsl .
+      <fs_alv_2>-ksl1 =  gt_writeoff-ksl.
+    ELSEIF gt_writeoff-rtcur EQ 'TWD'.
+      <fs_alv_2>-ksl1 = gt_writeoff-tsl .
+    ENDIF.
+    IF gt_writeoff-is_negative EQ 'X'.
+      <fs_alv_2>-is_negative = 'X'.
+    ENDIF.
+
+    " 貸項
+    APPEND INITIAL LINE TO gt_alv ASSIGNING FIELD-SYMBOL(<fs_alv_3>).
+    <fs_alv_3>-sgtxt = gt_writeoff-gkont.
+    <fs_alv_3>-picklow = gt_writeoff-picklow.
+    IF gt_writeoff-rtcur EQ 'USD'.
+      <fs_alv_3>-tsl2 = gt_writeoff-tsl .
+      <fs_alv_3>-ksl2 =  gt_writeoff-ksl.
+    ELSEIF gt_writeoff-rtcur EQ 'TWD'.
+      <fs_alv_3>-ksl2 = gt_writeoff-tsl .
+    ENDIF.
+    IF gt_writeoff-is_negative EQ 'X'.
+      <fs_alv_3>-is_negative = 'X'.
+    ENDIF.
+
+    "輸入空白行
+    APPEND INITIAL LINE TO gt_alv ASSIGNING FIELD-SYMBOL(<fs_alv_4>).
+    <fs_alv_4>-picklow = gt_writeoff-picklow.
+    IF gt_writeoff-is_negative EQ 'X'.
+      <fs_alv_4>-is_negative = 'X'.
+    ENDIF.
+  ENDLOOP.
+
+  DATA lv_index TYPE i.
+  lv_index = 5.
+
+  DATA : lv_result_1    TYPE p DECIMALS 2,
+         lv_result_2    TYPE p DECIMALS 2,
+         lv_evaluat_ksl TYPE acdoca-ksl.
+
+  " 放入沖銷金額
+  LOOP AT gt_alv.
+    CLEAR: lv_result_1, lv_result_2,
+                  lv_evaluat_ksl.
+    lv_index = lv_index + 1.
+
+    cell: lo_worksheet lv_index 2 gt_alv-sgtxt 2 '0'.
+    IF gt_alv-tsl1 IS NOT INITIAL.
+      lv_result_1 = gt_alv-tsl1.
+      IF gt_alv-is_negative EQ 'X'.
+        lv_result_1 = lv_result_1 * -1.
+      ELSEIF gt_alv-is_negative NE 'X'.
+        lv_result_1 = abs( lv_result_1 ).
+      ENDIF.
+      cell lo_worksheet lv_index 4 lv_result_1 2 'USD'.
+    ENDIF.
+    IF gt_alv-tsl2 IS NOT INITIAL.
+      lv_result_1 = gt_alv-tsl2.
+      IF gt_alv-is_negative EQ 'X'.
+        lv_result_1 = lv_result_1 * -1.
+      ELSEIF gt_alv-is_negative NE 'X'.
+        lv_result_1 = abs( lv_result_1 ).
+      ENDIF.
+      lv_result_1 = abs( lv_result_1 ).
+      cell lo_worksheet lv_index 6 lv_result_1 2 'USD'.
+    ENDIF.
+    IF gt_alv-ksl1 IS NOT INITIAL.
+      lv_result_2 = gt_alv-ksl1.
+      IF gt_alv-is_negative EQ 'X'.
+        lv_result_2 = lv_result_2 * -1.
+      ELSEIF gt_alv-is_negative NE 'X'.
+        lv_result_2 = abs( lv_result_2 ).
+      ENDIF.
+      cell lo_worksheet lv_index 8 lv_result_2 2 'TWD'.
+    ENDIF.
+    IF gt_alv-ksl2 IS NOT INITIAL.
+      lv_result_2 = gt_alv-ksl2.
+      IF gt_alv-is_negative EQ 'X'.
+        lv_result_2 = lv_result_2 * -1.
+      ELSEIF gt_alv-is_negative NE 'X'.
+        lv_result_2 = abs( lv_result_2 ).
+      ENDIF.
+      cell lo_worksheet lv_index 10 lv_result_2 2 'TWD'.
+    ENDIF.
+
+    lv_result_1 = lv_result_1 * gv_aver_ukurs.
+    IF lv_result_1 IS NOT INITIAL.
+      IF gt_alv-picklow EQ 'X'.
+        IF lv_result_1 > lv_result_2.
+          lv_evaluat_ksl = lv_result_2.
+        ELSEIF lv_result_1 < lv_result_2.
+          lv_evaluat_ksl = lv_result_1.
+        ELSEIF lv_result_1 = lv_result_2.
+          lv_evaluat_ksl = lv_result_1.
+        ENDIF.
+      ELSEIF gt_alv-picklow EQ ''.
+        lv_evaluat_ksl = lv_result_2.
+      ENDIF.
+    ELSEIF lv_result_1 IS INITIAL.
+      lv_evaluat_ksl = lv_result_2.
+    ENDIF.
+    IF gt_alv-tsl1 IS NOT INITIAL
+      OR gt_alv-ksl1 IS NOT INITIAL.
+      cell lo_worksheet lv_index 11 lv_evaluat_ksl 2 'TWD'.
+      gv_evaluat_ksl  = gv_evaluat_ksl  + lv_evaluat_ksl.
+    ENDIF.
+  ENDLOOP.
+  cell:
+    lo_worksheet 24 10 '沖銷金額' 2 '',
+    lo_worksheet 24 11 gv_evaluat_ksl 2 'TWD'.
+ENDFORM.

@@ -1,0 +1,136 @@
+*&---------------------------------------------------------------------*
+*&                           Report ZFI007F1
+*&---------------------------------------------------------------------*
+*&  Description：  財務報表
+*&
+*&=====================================================================*
+*& Modification Log - History
+*&=====================================================================*
+*& Date       Modifier     Request_No Description
+*&---------------------------------------------------------------------*
+*& 2022/01/20  Tim    DEVK908349  Create program
+*& 2022/02/23  Tim   DEVK908385   新增業務範圍、各期間營收資料修改
+*& 2022/03/03  Tim   DEVK908409   更新正式區 使用
+*& 2022/06/01  Tim   DEVK908914   新增IS_Company Sheet
+*& 2022/06/16  Tim   DEVK908944   新增各事業處 Sheet
+*& 2022/06/30  Tim   DEVK908974   事業處合併、沖銷金額修正、負數格式調整
+*& 2022/07/22  Tim   DEVK909004   修正年度占比四捨五入問題
+*& 2023/03/08  Tim   DEVK909361   IS_合併 Sheet 小數位進位調整
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+REPORT ZFI007F1.
+
+INCLUDE ole2incl.
+
+INCLUDE zfi007f1_top.
+
+INCLUDE zfi007f1_screen.
+
+INCLUDE zfi007f1_oaor.
+
+INCLUDE zfi007f1_reversing_entry.  " 沖銷分錄 Sheet
+
+INCLUDE zfi007f1_is_merge.  " IS Merge Sheet
+
+INCLUDE zfi007f1_announce. " 公告資料 Sheet
+
+INCLUDE zfi007f1_is_company. " IS Company Sheet
+
+INCLUDE zfi007f1_each_business.  " 各事業處 Sheet
+
+START-OF-SELECTION.
+
+  CALL FUNCTION 'G_SET_USER_PARAMETER'
+    EXPORTING
+      parameter_id          = 'AC_FLUSH_IT'
+      parameter_value       = 'X'
+    EXCEPTIONS
+      does_not_exist        = 1
+      OTHERS                = 2.
+  COMMIT WORK.
+
+
+  gv_last_day = p_gjahr && p_poper+1(2).
+
+  CALL FUNCTION 'RP_LAST_DAY_OF_MONTHS'
+    EXPORTING
+      day_in                  = gv_last_day
+    IMPORTING
+      last_day_of_month       = gv_last_day
+    EXCEPTIONS
+      day_in_no_date          = 1
+      OTHERS                  = 2.
+
+  DATA: lv_string_tmp TYPE string,
+      lv_gdatu TYPE tcurr-gdatu.
+
+  lv_string_tmp = gv_last_day.
+
+  lv_gdatu = 99999999 - lv_string_tmp.
+
+  SELECT
+    *
+    FROM tcurr
+    INTO @DATA(ls_tcurr)
+    WHERE fcurr EQ 'USD'
+      AND tcurr EQ 'TWD'
+      AND gdatu EQ @lv_gdatu
+      AND ( kurst EQ 'ZTW1'
+         OR  kurst EQ 'ZTW3' ).
+    IF ls_tcurr-kurst EQ 'ZTW1'.
+      gv_end_ukurs = ls_tcurr-ukurs.
+    ELSEIF ls_tcurr-kurst EQ 'ZTW3'.
+      gv_aver_ukurs = ls_tcurr-ukurs.
+    ENDIF.
+  ENDSELECT.
+
+  IF gv_end_ukurs IS INITIAL.
+    MESSAGE '缺少' && p_gjahr && '年' && p_poper
+        && '月期末匯率，請先至 TCURMNT 維護匯率類型 ZTW1 匯率'  TYPE 'E'.
+    EXIT.
+  ELSEIF gv_aver_ukurs IS INITIAL.
+    MESSAGE '缺少' && p_gjahr && '年' && p_poper
+        && '月平均匯率，請先至 TCURMNT 維護匯率類型 ZTW1 匯率'  TYPE 'E'.
+    EXIT.
+  ENDIF.
+
+  CHECK gv_aver_ukurs IS NOT INITIAL.
+
+  CREATE OBJECT lo_application 'Excel.Application'.
+  CALL METHOD OF lo_application 'Workbooks' = lo_workbooks.
+  CALL METHOD OF lo_workbooks 'Add' = lo_workbook.
+  SET PROPERTY OF lo_application 'Visible' = 0.
+
+  PERFORM create_reversing_entry_sheet.
+
+  PERFORM create_is_merge_sheet.
+
+  PERFORM announce_information_sheet.
+
+  PERFORM create_is_company_sheet.
+
+  PERFORM create_each_business.
+
+  CONCATENATE p_folder  '\' p_gjahr '_' p_poper+1(2) '營收' INTO lv_complete_path.
+
+  CALL METHOD OF lo_workbook 'SaveAs' EXPORTING #1 = lv_complete_path.
+
+  IF sy-subrc EQ 0.
+    MESSAGE '檔案儲存成功！'  TYPE 'S'.
+  ELSE.
+    MESSAGE '檔案儲存失敗！' TYPE 'E'.
+  ENDIF.
+
+  CALL FUNCTION 'G_SET_USER_PARAMETER'
+    EXPORTING
+       parameter_id          = 'AC_FLUSH_IT'
+       parameter_value       = ''
+    EXCEPTIONS
+      does_not_exist        = 1
+      OTHERS                = 2.
+   COMMIT WORK.
+
+  CALL METHOD OF lo_application 'QUIT'.
+  FREE OBJECT lo_worksheet.
+  FREE OBJECT lo_workbook.
+  FREE OBJECT lo_application.
