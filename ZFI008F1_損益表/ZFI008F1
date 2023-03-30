@@ -1,0 +1,1927 @@
+*&---------------------------------------------------------------------*
+*& Report ZFI008F1
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zfi008f1.
+
+INCLUDE ole2incl.
+
+INCLUDE zfi008f1_top.
+
+INCLUDE zfi008f1_screen.
+
+START-OF-SELECTION.
+
+  CALL FUNCTION 'G_SET_USER_PARAMETER'
+    EXPORTING
+      parameter_id    = 'AC_FLUSH_IT'
+      parameter_value = 'X'
+    EXCEPTIONS
+      does_not_exist  = 1
+      OTHERS          = 2.
+  COMMIT WORK.
+
+  CREATE OBJECT lo_application 'Excel.Application'.
+  CALL METHOD OF lo_application 'Workbooks' = lo_workbooks.
+  CALL METHOD OF lo_workbooks 'Add' = lo_workbook.
+  SET PROPERTY OF lo_application 'Visible' = 0.
+
+  GET PROPERTY OF lo_application 'ACTIVESHEET' = lo_worksheet.
+  SET PROPERTY OF lo_worksheet 'Name' = '趨勢圖'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'A1'
+      #2 = 'O1'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'A2'
+      #2 = 'O2'.
+  CALL METHOD OF lo_cell 'MERGE'.
+
+  " Set 欄位寬度
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'A1'
+      #2 = 'A1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '34.82'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'B1'
+      #2 = 'B1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'C1'
+      #2 = 'C1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'D1'
+      #2 = 'D1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'E1'
+      #2 = 'E1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'F1'
+      #2 = 'F1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'G1'
+      #2 = 'G1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'H1'
+      #2 = 'H1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'I1'
+      #2 = 'I1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'J1'
+      #2 = 'J1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'K1'
+      #2 = 'K1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'L1'
+      #2 = 'L1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'M1'
+      #2 = 'M1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'N1'
+      #2 = 'N1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'O1'
+      #2 = 'O1'.
+  GET PROPERTY OF lo_cell 'COLUMNS' = lo_col.
+  SET PROPERTY OF lo_col 'COLUMNWIDTH' = '12.00'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'J1'
+      #2 = 'K1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'.
+  "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'.
+  "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'J2'
+      #2 = 'K2'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'.
+  "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'.
+  "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  CALL METHOD OF lo_worksheet 'Range' = lo_cell
+    EXPORTING
+      #1 = 'J3'
+      #2 = 'K3'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '7'.
+  "xlEdgeLeft
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '10'.
+  "xlEdgeRight
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+  CALL METHOD OF lo_cell 'Borders' = lo_borders EXPORTING #1 = '9'.
+  "xlEdgeBottom
+  SET PROPERTY OF lo_borders 'LineStyle' = '1'.
+
+  " 輸入表頭資訊
+  IF p_prctr EQ '20S00' OR p_prctr EQ '20S10'
+    OR p_prctr EQ '20S20' OR p_prctr EQ '20Q00'.
+    cell:
+      lo_worksheet 1 1 '精密扣件事業處' 3 '0'.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20S00'.
+    APPEND gr_prctr.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20S10'.
+    APPEND gr_prctr.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20S20'.
+    APPEND gr_prctr.
+    " 扣一 與 扣二合併
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20Q00'.
+    APPEND gr_prctr.
+    IF p_prctr EQ '20S00' OR p_prctr EQ '20S10'
+      OR p_prctr EQ '20S20'.
+      gv_werks = '1001'.
+    ELSEIF p_prctr EQ '20Q00'.
+      gv_werks = '1004'.
+    ENDIF.
+  ELSEIF p_prctr EQ '20E00'.
+    cell:
+      lo_worksheet 1 1 '醫療事業處' 3 '0'.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20E00'.
+    APPEND gr_prctr.
+    gv_werks = '1002'.
+  ELSEIF p_prctr EQ '20T00'.
+    cell:
+      lo_worksheet 1 1 '微波開關事業處' 3 '0'.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20T00'.
+    APPEND gr_prctr.
+    gv_werks = '1003'.
+  ELSEIF p_prctr EQ '20B00' OR p_prctr EQ '20D00'.
+    cell:
+      lo_worksheet 1 1 '植入物事業單位' 3 '0'.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20B00'.
+    APPEND gr_prctr.
+    " 植入物 與 牙科 合併
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20D00'.
+    APPEND gr_prctr.
+    IF p_prctr EQ '20B00'.
+      gv_werks = '1005'.
+    ELSEIF p_prctr EQ '20D00'.
+      gv_werks = '1007'.
+    ENDIF.
+  ELSEIF p_prctr EQ '20R00'.
+    cell:
+      lo_worksheet 1 1 'SFR事業單位' 3 '0'.
+    gr_prctr-sign = 'I'.
+    gr_prctr-option = 'EQ'.
+    gr_prctr-low = '20R00'.
+    APPEND gr_prctr.
+    gv_werks = '1006'.
+  ENDIF.
+
+*  IF p_werks EQ '1001' or p_werks EQ '1004'.
+*    cell:
+*      lo_worksheet 1 1 '精密扣件事業處' 3 '0'.
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20S00'.
+*    gr_prctr-low = '20S99'.
+*    APPEND gr_prctr.
+*    " 扣一 與 扣二合併
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20Q00'.
+*    APPEND gr_prctr.
+*  ELSEIF p_werks EQ '1002' OR p_werks EQ '1011'.
+*    cell:
+*      lo_worksheet 1 1 '醫療事業處' 3 '0'.
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20E00'.
+*    APPEND gr_prctr.
+*    " 醫療 與 MIM 合併
+**    gr_prctr-sign = 'I'.
+**    gr_prctr-option = 'EQ'.
+**    gr_prctr-low = '20M00'.
+**    APPEND gr_prctr.
+*  ELSEIF p_werks EQ '1003'.
+*    cell:
+*      lo_worksheet 1 1 '微波開關事業處' 3 '0'.
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20T00'.
+*    APPEND gr_prctr.
+*  ELSEIF p_werks EQ '1005' or p_werks EQ '1007'.
+*    cell:
+*      lo_worksheet 1 1 '植入物事業單位' 3 '0'.
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20B00'.
+*    APPEND gr_prctr.
+*    " 植入物 與 牙科 合併
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20D00'.
+*    APPEND gr_prctr.
+*  ELSEIF p_werks EQ '1006'.
+*    cell:
+*      lo_worksheet 1 1 'SFR事業單位' 3 '0'.
+*    gr_prctr-sign = 'I'.
+*    gr_prctr-option = 'EQ'.
+*    gr_prctr-low = '20R00'.
+*    APPEND gr_prctr.
+*  ENDIF.
+
+  gv_tmp_str = p_gjahr && '年損益趨勢圖'.
+
+  cell:
+    lo_worksheet 2 1 gv_tmp_str 3 '0',
+    lo_worksheet 3 2 'Jan' 3 '0',
+    lo_worksheet 3 3 'Feb' 3 '0',
+    lo_worksheet 3 4 'Mar' 3 '0',
+    lo_worksheet 3 5 'Apr' 3 '0',
+    lo_worksheet 3 6 'May' 3 '0',
+    lo_worksheet 3 7 'Jun' 3 '0',
+    lo_worksheet 3 8 'Jul' 3 '0',
+    lo_worksheet 3 9 'Aug' 3 '0',
+    lo_worksheet 3 10 'Sep' 3 '0',
+    lo_worksheet 3 11 'Oct' 3 '0',
+    lo_worksheet 3 12 'Nov' 3 '0',
+    lo_worksheet 3 13 'Dec' 3 '0'.
+
+  DATA lv_title TYPE string.
+  IF p_poper EQ 1.
+    lv_title = '1 月合計'.
+  ELSEIF p_poper NE 1.
+    lv_title = '1 -' && p_poper+1(2) && '月合計'.
+  ENDIF.
+  cell: lo_worksheet 3 14 lv_title 3 '0'.
+
+  IF p_poper EQ 1.
+    lv_title = '1 月平均'.
+  ELSEIF p_poper NE 1.
+    lv_title = '1 -' && p_poper+1(2) && '月平均'.
+  ENDIF.
+  cell: lo_worksheet 3 15 lv_title 3 '0'.
+
+  SELECT
+    queue,
+    description
+  FROM zfi008t1
+  INTO TABLE @DATA(gt_description).
+
+  SORT gt_description BY description.
+  DELETE ADJACENT DUPLICATES FROM gt_description COMPARING description.
+  SORT gt_description BY queue.
+
+  DATA: lv_row TYPE i,
+        lv_col TYPE i.
+
+  lv_row = 4.
+  lv_col = 1.
+  DO 12 TIMES.
+    lv_col = lv_col + 1.
+    IF sy-index > ( p_poper + 2 )
+      AND sy-index NE 12.
+      CALL METHOD OF lo_worksheet 'COLUMNS' = lo_cell
+        EXPORTING
+          #1 = lv_col. " 2 = Column B
+      SET PROPERTY OF lo_cell 'Hidden' = 1.
+    ENDIF.
+  ENDDO.
+
+  LOOP AT gt_description
+    ASSIGNING FIELD-SYMBOL(<fs_description>).
+
+    SELECT
+      *
+    FROM zfi008t1
+    INTO @DATA(ls_zfi008t1)
+    WHERE description EQ @<fs_description>-description.
+
+      gr_racct-sign = 'I'.
+      gr_racct-option = 'BT'.
+      gr_racct-low = ls_zfi008t1-racct_low.
+      gr_racct-high = ls_zfi008t1-racct_high.
+      APPEND gr_racct.
+      IF ls_zfi008t1-rbukrs IS NOT INITIAL.
+        gr_bukrs-sign = 'I'.
+        gr_bukrs-option = 'EQ'.
+        gr_bukrs-low = ls_zfi008t1-rbukrs.
+        APPEND gr_bukrs.
+      ENDIF.
+      IF ls_zfi008t1-rfarea IS NOT INITIAL.
+        gr_rfarea-sign = 'I'.
+        gr_rfarea-option = 'EQ'.
+        gr_rfarea-low = ls_zfi008t1-rfarea.
+        APPEND gr_rfarea.
+      ENDIF.
+
+      SELECT
+        *
+      FROM glpct
+      INTO @DATA(ls_glpct)
+      WHERE rldnr EQ '8A'
+        AND ( rrcty EQ 0
+          OR rrcty EQ 2 )
+        AND ryear EQ @p_gjahr
+        AND rprctr IN @gr_prctr
+        AND rbukrs IN @gr_bukrs
+        AND rfarea IN @gr_rfarea
+        AND racct IN @gr_racct.
+        IF ls_zfi008t1-operation EQ '-'.
+          gv_ksl01 = gv_ksl01 + ls_glpct-ksl01 * 100 * -1.
+          gv_ksl02 = gv_ksl02 + ls_glpct-ksl02 * 100 * -1.
+          gv_ksl03 = gv_ksl03 + ls_glpct-ksl03 * 100 * -1.
+          gv_ksl04 = gv_ksl04 + ls_glpct-ksl04 * 100 * -1.
+          gv_ksl05 = gv_ksl05 + ls_glpct-ksl05 * 100 * -1.
+          gv_ksl06 = gv_ksl06 + ls_glpct-ksl06 * 100 * -1.
+          gv_ksl07 = gv_ksl07 + ls_glpct-ksl07 * 100 * -1.
+          gv_ksl08 = gv_ksl08 + ls_glpct-ksl08 * 100 * -1.
+          gv_ksl09 = gv_ksl09 + ls_glpct-ksl09 * 100 * -1.
+          gv_ksl10 = gv_ksl10 + ls_glpct-ksl10 * 100 * -1.
+          gv_ksl11 = gv_ksl11 + ls_glpct-ksl11 * 100 * -1.
+          gv_ksl12 = gv_ksl12 + ls_glpct-ksl12 * 100 * -1.
+        ELSE.
+          gv_ksl01 = gv_ksl01 + ls_glpct-ksl01 * 100.
+          gv_ksl02 = gv_ksl02 + ls_glpct-ksl02 * 100.
+          gv_ksl03 = gv_ksl03 + ls_glpct-ksl03 * 100.
+          gv_ksl04 = gv_ksl04 + ls_glpct-ksl04 * 100.
+          gv_ksl05 = gv_ksl05 + ls_glpct-ksl05 * 100.
+          gv_ksl06 = gv_ksl06 + ls_glpct-ksl06 * 100.
+          gv_ksl07 = gv_ksl07 + ls_glpct-ksl07 * 100.
+          gv_ksl08 = gv_ksl08 + ls_glpct-ksl08 * 100.
+          gv_ksl09 = gv_ksl09 + ls_glpct-ksl09 * 100.
+          gv_ksl10 = gv_ksl10 + ls_glpct-ksl10 * 100.
+          gv_ksl11 = gv_ksl11 + ls_glpct-ksl11 * 100.
+          gv_ksl12 = gv_ksl12 + ls_glpct-ksl12 * 100.
+        ENDIF.
+      ENDSELECT.
+      CLEAR: gr_racct, gr_bukrs, gr_rfarea.
+      FREE: gr_racct, gr_bukrs, gr_rfarea.
+    ENDSELECT.
+
+    CASE p_poper.
+      WHEN '001'.
+        gv_sum = gv_ksl01 .
+        CLEAR: gv_ksl02, gv_ksl03, gv_ksl04,
+         gv_ksl05, gv_ksl06, gv_ksl07,
+         gv_ksl08, gv_ksl09, gv_ksl10,
+         gv_ksl11, gv_ksl12.
+      WHEN '002'.
+        gv_sum = gv_ksl01 + gv_ksl02.
+        CLEAR: gv_ksl03, gv_ksl04, gv_ksl05,
+         gv_ksl06, gv_ksl07, gv_ksl08,
+         gv_ksl09, gv_ksl10, gv_ksl11,
+         gv_ksl12.
+      WHEN '003'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03.
+        CLEAR:  gv_ksl04, gv_ksl05, gv_ksl06,
+         gv_ksl07, gv_ksl08, gv_ksl09,
+         gv_ksl10, gv_ksl11, gv_ksl12.
+      WHEN '004'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04.
+        CLEAR: gv_ksl05, gv_ksl06, gv_ksl07,
+         gv_ksl08, gv_ksl09, gv_ksl10,
+         gv_ksl11, gv_ksl12.
+      WHEN '005'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05.
+        CLEAR:  gv_ksl06, gv_ksl07, gv_ksl08,
+         gv_ksl09, gv_ksl10, gv_ksl11,
+         gv_ksl12.
+      WHEN '006'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06.
+        CLEAR: gv_ksl07, gv_ksl08, gv_ksl09,
+         gv_ksl10, gv_ksl11, gv_ksl12.
+      WHEN '007'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07.
+        CLEAR: gv_ksl08, gv_ksl09, gv_ksl10,
+         gv_ksl11, gv_ksl12.
+      WHEN '008'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07 + gv_ksl08.
+        CLEAR: gv_ksl09, gv_ksl10, gv_ksl11,
+         gv_ksl12.
+      WHEN '009'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07 + gv_ksl08 + gv_ksl09.
+        CLEAR: gv_ksl10, gv_ksl11, gv_ksl12.
+      WHEN '010'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07 + gv_ksl08 + gv_ksl09
+          + gv_ksl10.
+        CLEAR: gv_ksl11, gv_ksl12.
+      WHEN '011'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07 + gv_ksl08 + gv_ksl09
+          + gv_ksl10 + gv_ksl11 .
+        CLEAR: gv_ksl12.
+      WHEN '012'.
+        gv_sum = gv_ksl01 + gv_ksl02 + gv_ksl03
+          + gv_ksl04 + gv_ksl05 + gv_ksl06
+          + gv_ksl07 + gv_ksl08 + gv_ksl09
+          + gv_ksl10 + gv_ksl11 + gv_ksl12.
+    ENDCASE.
+    gv_average = gv_sum / p_poper.
+
+    APPEND INITIAL LINE TO gt_zfi008t2 ASSIGNING
+    FIELD-SYMBOL(<fs_zfi008t2>).
+    <fs_zfi008t2>-gjahr = p_gjahr.
+    <fs_zfi008t2>-poper = p_poper.
+    <fs_zfi008t2>-werks = gv_werks.
+    <fs_zfi008t2>-description = <fs_description>-description.
+    IF ls_zfi008t1-operation EQ '-'.
+      <fs_zfi008t2>-ksl01 = gv_ksl01 * -1.
+      <fs_zfi008t2>-ksl02 = gv_ksl02 * -1.
+      <fs_zfi008t2>-ksl03 = gv_ksl03 * -1.
+      <fs_zfi008t2>-ksl04 = gv_ksl04 * -1.
+      <fs_zfi008t2>-ksl05 = gv_ksl05 * -1.
+      <fs_zfi008t2>-ksl06 = gv_ksl06 * -1.
+      <fs_zfi008t2>-ksl07 = gv_ksl07 * -1.
+      <fs_zfi008t2>-ksl08 = gv_ksl08 * -1.
+      <fs_zfi008t2>-ksl09 = gv_ksl09 * -1.
+      <fs_zfi008t2>-ksl10 = gv_ksl10 * -1.
+      <fs_zfi008t2>-ksl11 = gv_ksl11 * -1.
+      <fs_zfi008t2>-ksl12 = gv_ksl12 * -1.
+      <fs_zfi008t2>-ksl_sum = gv_sum * -1.
+      <fs_zfi008t2>-ksl_average = gv_average * -1.
+    ELSE.
+      <fs_zfi008t2>-ksl01 = abs( gv_ksl01 ).
+      <fs_zfi008t2>-ksl02 = abs( gv_ksl02 ).
+      <fs_zfi008t2>-ksl03 = abs( gv_ksl03 ).
+      <fs_zfi008t2>-ksl04 = abs( gv_ksl04 ).
+      <fs_zfi008t2>-ksl05 = abs( gv_ksl05 ).
+      <fs_zfi008t2>-ksl06 = abs( gv_ksl06 ).
+      <fs_zfi008t2>-ksl07 = abs( gv_ksl07 ).
+      <fs_zfi008t2>-ksl08 = abs( gv_ksl08 ).
+      <fs_zfi008t2>-ksl09 = abs( gv_ksl09 ).
+      <fs_zfi008t2>-ksl10 = abs( gv_ksl10 ).
+      <fs_zfi008t2>-ksl11 = abs( gv_ksl11 ).
+      <fs_zfi008t2>-ksl12 = abs( gv_ksl12 ).
+      <fs_zfi008t2>-ksl_sum = abs( gv_sum ).
+      <fs_zfi008t2>-ksl_average = abs( gv_average ).
+    ENDIF.
+
+    CLEAR: gr_racct, gv_ksl01, gv_ksl02, gv_ksl03,
+      gv_ksl04, gv_ksl05, gv_ksl06,
+      gv_ksl07, gv_ksl08, gv_ksl09,
+      gv_ksl10, gv_ksl11, gv_ksl12,
+      gv_sum, gv_average.
+    UNASSIGN: <fs_zfi008t2>.
+  ENDLOOP.
+
+  " 計算產品收入
+  PERFORM calculate_product_revenue.
+
+  " 計算產品成本
+  PERFORM calculate_product_cost.
+
+  " 計算合併成本調整
+  "PERFORM calculate_merge_cost.
+
+  "計算營業毛利
+  PERFORM calculate_operation_profit.
+
+  "計算毛利率
+  PERFORM calculate_gross_profit.
+
+  " 計算毛利率---全部(含模治具)
+  PERFORM calculate_gross_profit_mold.
+
+  "計算營業費用(不含共同)淨額
+  PERFORM callculate_operation_cost.
+
+  " 計算研發費用
+  PERFORM callculate_research_cost.
+
+  " 計算其他管理費用
+  PERFORM callculate_other_manager_cost.
+
+  " 計算營業淨利
+  PERFORM calculate_net_operating_profit.
+
+  " 計算稅前淨利
+  PERFORM calculate_profit_before_tax.
+
+  " 計算稅前純益率
+  PERFORM calculate_pre_tax_income.
+
+  DATA: lv_tmp_str TYPE string.
+
+  LOOP AT gt_zfi008t2 INTO gs_zfi008t2.
+    IF gs_zfi008t2-description EQ '                       ---全部(含模治具)'
+      OR gs_zfi008t2-description EQ '        稅前純益率'.
+      cell: lo_worksheet lv_row 1 gs_zfi008t2-description 1 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl01.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 2 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl02.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 3 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl03.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 4 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl04.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 5 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl05.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 6 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl06.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 7 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl07.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 8 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl08.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 9 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl09.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 10 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl10.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 11 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl11.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 12 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl12.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 13 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl_sum.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 14 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = gs_zfi008t2-ksl_average.
+      lv_tmp_str = lv_tmp_str && '%'.
+      cell: lo_worksheet lv_row 15 lv_tmp_str 3 '0'.
+    ELSEIF gs_zfi008t2-description EQ '    ---產品成本'.
+      cell: lo_worksheet lv_row 1 gs_zfi008t2-description 1 '0'.
+
+      lv_tmp_str = '=B8-B10-B11'.
+      cell: lo_worksheet lv_row 2 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=C8-C10-C11'.
+      cell: lo_worksheet lv_row 3 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=D8-D10-D11'.
+      cell: lo_worksheet lv_row 4 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=E8-E10-E11'.
+      cell: lo_worksheet lv_row 5 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=F8-F10-F11'.
+      cell: lo_worksheet lv_row 6 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=G8-G10-G11'.
+      cell: lo_worksheet lv_row 7 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=H8-H10-H11'.
+      cell: lo_worksheet lv_row 8 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=I8-I10-I11'.
+      cell: lo_worksheet lv_row 9 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=J8-J10-J11'.
+      cell: lo_worksheet lv_row 10 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=K8-K10-K11'.
+      cell: lo_worksheet lv_row 11 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=L8-L10-L11'.
+      cell: lo_worksheet lv_row 12 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=M8-M10-M11'.
+      cell: lo_worksheet lv_row 13 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=N8-N10-N11'.
+      cell: lo_worksheet lv_row 14 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=O8-O10-O11'.
+      cell: lo_worksheet lv_row 15 lv_tmp_str 3 '0'.
+
+    ELSEIF gs_zfi008t2-description EQ '           毛利率---產品'.
+      cell: lo_worksheet lv_row 1 gs_zfi008t2-description 1 '0'.
+
+      lv_tmp_str = '=(B5+B7-B9-B10)/ABS(B5+B7)'.
+      cell: lo_worksheet lv_row 2 lv_tmp_str 3 '%'.
+
+      lv_tmp_str = '=(C5+C7-C9-C10)/ABS(C5+C7)'.
+      cell: lo_worksheet lv_row 3 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(D5+D7-D9-D10)/ABS(D5+D7)'.
+      cell: lo_worksheet lv_row 4 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(E5+E7-E9-E10)/ABS(E5+E7)'.
+      cell: lo_worksheet lv_row 5 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(F5+F7-F9-F10)/ABS(F5+F7)'.
+      cell: lo_worksheet lv_row 6 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(G5+G7-G9-G10)/ABS(G5+G7)'.
+      cell: lo_worksheet lv_row 7 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(H5+H7-H9-H10)/ABS(H5+H7)'.
+      cell: lo_worksheet lv_row 8 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(I5+I7-I9-I10)/ABS(I5+I7)'.
+      cell: lo_worksheet lv_row 9 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(J5+J7-J9-J10)/ABS(J5+J7)'.
+      cell: lo_worksheet lv_row 10 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(K5+K7-K9-K10)/ABS(K5+K7)'.
+      cell: lo_worksheet lv_row 11 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(L5+L7-L9-L10)/ABS(L5+L7)'.
+      cell: lo_worksheet lv_row 12 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(M5+M7-M9-M10)/ABS(M5+M7)'.
+      cell: lo_worksheet lv_row 13 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(N5+N7-N9-N10)/ABS(N5+N7)'.
+      cell: lo_worksheet lv_row 14 lv_tmp_str 3 '0'.
+
+      lv_tmp_str = '=(O5+O7-O9-O10)/ABS(O5+O7)'.
+      cell: lo_worksheet lv_row 15 lv_tmp_str 3 '0'.
+
+    ELSE.
+      cell:
+        lo_worksheet lv_row 1 gs_zfi008t2-description 1 '0',
+        lo_worksheet lv_row 2 gs_zfi008t2-ksl01 3 'TWD',
+        lo_worksheet lv_row 3 gs_zfi008t2-ksl02 3 'TWD',
+        lo_worksheet lv_row 4 gs_zfi008t2-ksl03 3 'TWD',
+        lo_worksheet lv_row 5 gs_zfi008t2-ksl04 3 'TWD',
+        lo_worksheet lv_row 6 gs_zfi008t2-ksl05 3 'TWD',
+        lo_worksheet lv_row 7 gs_zfi008t2-ksl06 3 'TWD',
+        lo_worksheet lv_row 8 gs_zfi008t2-ksl07 3 'TWD',
+        lo_worksheet lv_row 9 gs_zfi008t2-ksl08 3 'TWD',
+        lo_worksheet lv_row 10 gs_zfi008t2-ksl09 3 'TWD',
+        lo_worksheet lv_row 11 gs_zfi008t2-ksl10 3 'TWD',
+        lo_worksheet lv_row 12 gs_zfi008t2-ksl11 3 'TWD',
+        lo_worksheet lv_row 13 gs_zfi008t2-ksl12 3 'TWD',
+        lo_worksheet lv_row 14 gs_zfi008t2-ksl_sum 3 'TWD',
+        lo_worksheet lv_row 15 gs_zfi008t2-ksl_average 3 'TWD'.
+    ENDIF.
+    lv_row = lv_row + 1.
+  ENDLOOP.
+
+  " 更新 ZFI008T2
+  MODIFY zfi008t2 FROM TABLE gt_zfi008t2.
+
+  DATA: lv_year_tranfer_i TYPE i,
+        lv_year_tranfer_s TYPE string.
+  lv_year_tranfer_i = p_gjahr -  1911.
+  lv_year_tranfer_s = lv_year_tranfer_i.
+  CONCATENATE p_folder  '\' lv_year_tranfer_s '_' p_poper+1(2) '損益表'
+  INTO lv_complete_path.
+
+  CALL METHOD OF lo_workbook 'SaveAs' EXPORTING #1 = lv_complete_path.
+
+  IF sy-subrc EQ 0.
+    MESSAGE '檔案儲存成功！'  TYPE 'S'.
+  ELSE.
+    MESSAGE '檔案儲存失敗！' TYPE 'E'.
+  ENDIF.
+
+  CALL FUNCTION 'G_SET_USER_PARAMETER'
+    EXPORTING
+      parameter_id    = 'AC_FLUSH_IT'
+      parameter_value = ''
+    EXCEPTIONS
+      does_not_exist  = 1
+      OTHERS          = 2.
+  COMMIT WORK.
+
+  CALL METHOD OF lo_application 'QUIT'.
+  FREE OBJECT lo_worksheet.
+  FREE OBJECT lo_workbook.
+  FREE OBJECT lo_application.
+
+*&--------------------------------------------------------------------&
+*
+*                             計算產品收入
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_product_revenue.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品收入'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_product_revenue>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業收入淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_product_revenue>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_product_revenue>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_product_revenue>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_product_revenue>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_product_revenue>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_product_revenue>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_product_revenue>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_product_revenue>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_product_revenue>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_product_revenue>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_product_revenue>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_product_revenue>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_product_revenue>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_product_revenue>-ksl_average = ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---經常性模治具收入'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_product_revenue>-ksl01 =
+    <fs_zfi008t2_product_revenue>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_product_revenue>-ksl02 =
+    <fs_zfi008t2_product_revenue>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_product_revenue>-ksl03 =
+    <fs_zfi008t2_product_revenue>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_product_revenue>-ksl04 =
+    <fs_zfi008t2_product_revenue>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_product_revenue>-ksl05 =
+    <fs_zfi008t2_product_revenue>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_product_revenue>-ksl06 =
+    <fs_zfi008t2_product_revenue>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_product_revenue>-ksl07 =
+    <fs_zfi008t2_product_revenue>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_product_revenue>-ksl08 =
+    <fs_zfi008t2_product_revenue>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_product_revenue>-ksl09 =
+    <fs_zfi008t2_product_revenue>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_product_revenue>-ksl10 =
+    <fs_zfi008t2_product_revenue>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_product_revenue>-ksl11 =
+    <fs_zfi008t2_product_revenue>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_product_revenue>-ksl12 =
+    <fs_zfi008t2_product_revenue>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_product_revenue>-ksl_sum =
+    <fs_zfi008t2_product_revenue>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_product_revenue>-ksl_average =
+    <fs_zfi008t2_product_revenue>-ksl_average - ls_zfi008t2-ksl_average
+    .
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---內部計價'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_product_revenue>-ksl01 =
+    <fs_zfi008t2_product_revenue>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_product_revenue>-ksl02 =
+    <fs_zfi008t2_product_revenue>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_product_revenue>-ksl03 =
+    <fs_zfi008t2_product_revenue>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_product_revenue>-ksl04 =
+    <fs_zfi008t2_product_revenue>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_product_revenue>-ksl05 =
+    <fs_zfi008t2_product_revenue>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_product_revenue>-ksl06 =
+    <fs_zfi008t2_product_revenue>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_product_revenue>-ksl07 =
+    <fs_zfi008t2_product_revenue>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_product_revenue>-ksl08 =
+    <fs_zfi008t2_product_revenue>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_product_revenue>-ksl09 =
+    <fs_zfi008t2_product_revenue>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_product_revenue>-ksl10 =
+    <fs_zfi008t2_product_revenue>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_product_revenue>-ksl11 =
+    <fs_zfi008t2_product_revenue>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_product_revenue>-ksl12 =
+    <fs_zfi008t2_product_revenue>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_product_revenue>-ksl_sum =
+    <fs_zfi008t2_product_revenue>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_product_revenue>-ksl_average =
+    <fs_zfi008t2_product_revenue>-ksl_average - ls_zfi008t2-ksl_average.
+
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                           計算產品收入
+*
+*&--------------------------------------------------------------------&
+FORM calculate_product_cost.
+  DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品成本'
+    ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_product_cost>).
+
+ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                          計算合併成本調整
+*
+*&--------------------------------------------------------------------&
+FORM calculate_merge_cost.
+  DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '    ---合併成本調整'
+    ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_product_cost>).
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-產品'
+    INTO ls_zfi008t2.
+
+  <fs_zfi008t2_product_cost>-ksl01 = ls_zfi008t2-ksl01.
+  <fs_zfi008t2_product_cost>-ksl02 = ls_zfi008t2-ksl02.
+  <fs_zfi008t2_product_cost>-ksl03 = ls_zfi008t2-ksl03.
+  <fs_zfi008t2_product_cost>-ksl04 = ls_zfi008t2-ksl04.
+  <fs_zfi008t2_product_cost>-ksl05 = ls_zfi008t2-ksl05.
+  <fs_zfi008t2_product_cost>-ksl06 = ls_zfi008t2-ksl06.
+  <fs_zfi008t2_product_cost>-ksl07 = ls_zfi008t2-ksl07.
+  <fs_zfi008t2_product_cost>-ksl08 = ls_zfi008t2-ksl08.
+  <fs_zfi008t2_product_cost>-ksl09 = ls_zfi008t2-ksl09.
+  <fs_zfi008t2_product_cost>-ksl10 = ls_zfi008t2-ksl10.
+  <fs_zfi008t2_product_cost>-ksl11 = ls_zfi008t2-ksl11.
+  <fs_zfi008t2_product_cost>-ksl12 = ls_zfi008t2-ksl12.
+  <fs_zfi008t2_product_cost>-ksl_sum = ls_zfi008t2-ksl_sum.
+  <fs_zfi008t2_product_cost>-ksl_average = ls_zfi008t2-ksl_average.
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品成本'
+    INTO ls_zfi008t2.
+
+  <fs_zfi008t2_product_cost>-ksl01 = <fs_zfi008t2_product_cost>-ksl01 -
+  ls_zfi008t2-ksl01.
+  <fs_zfi008t2_product_cost>-ksl02 = <fs_zfi008t2_product_cost>-ksl02 -
+  ls_zfi008t2-ksl02.
+  <fs_zfi008t2_product_cost>-ksl03 = <fs_zfi008t2_product_cost>-ksl03 -
+  ls_zfi008t2-ksl03.
+  <fs_zfi008t2_product_cost>-ksl04 = <fs_zfi008t2_product_cost>-ksl04 -
+  ls_zfi008t2-ksl04.
+  <fs_zfi008t2_product_cost>-ksl05 = <fs_zfi008t2_product_cost>-ksl05 -
+  ls_zfi008t2-ksl05.
+  <fs_zfi008t2_product_cost>-ksl06 = <fs_zfi008t2_product_cost>-ksl06 -
+  ls_zfi008t2-ksl06.
+  <fs_zfi008t2_product_cost>-ksl07 = <fs_zfi008t2_product_cost>-ksl07 -
+  ls_zfi008t2-ksl07.
+  <fs_zfi008t2_product_cost>-ksl08 = <fs_zfi008t2_product_cost>-ksl08 -
+  ls_zfi008t2-ksl08.
+  <fs_zfi008t2_product_cost>-ksl09 = <fs_zfi008t2_product_cost>-ksl09 -
+  ls_zfi008t2-ksl09.
+  <fs_zfi008t2_product_cost>-ksl10 = <fs_zfi008t2_product_cost>-ksl10 -
+  ls_zfi008t2-ksl10.
+  <fs_zfi008t2_product_cost>-ksl11 = <fs_zfi008t2_product_cost>-ksl11 -
+  ls_zfi008t2-ksl11.
+  <fs_zfi008t2_product_cost>-ksl12 = <fs_zfi008t2_product_cost>-ksl12 -
+  ls_zfi008t2-ksl12.
+  <fs_zfi008t2_product_cost>-ksl_sum =
+  <fs_zfi008t2_product_cost>-ksl_sum - ls_zfi008t2-ksl_sum.
+  <fs_zfi008t2_product_cost>-ksl_average =
+  <fs_zfi008t2_product_cost>-ksl_average - ls_zfi008t2-ksl_average.
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '    ---內部計價成本'
+    INTO ls_zfi008t2.
+
+  <fs_zfi008t2_product_cost>-ksl01 = <fs_zfi008t2_product_cost>-ksl01 -
+  ls_zfi008t2-ksl01.
+  <fs_zfi008t2_product_cost>-ksl02 = <fs_zfi008t2_product_cost>-ksl02 -
+  ls_zfi008t2-ksl02.
+  <fs_zfi008t2_product_cost>-ksl03 = <fs_zfi008t2_product_cost>-ksl03 -
+  ls_zfi008t2-ksl03.
+  <fs_zfi008t2_product_cost>-ksl04 = <fs_zfi008t2_product_cost>-ksl04 -
+  ls_zfi008t2-ksl04.
+  <fs_zfi008t2_product_cost>-ksl05 = <fs_zfi008t2_product_cost>-ksl05 -
+  ls_zfi008t2-ksl05.
+  <fs_zfi008t2_product_cost>-ksl06 = <fs_zfi008t2_product_cost>-ksl06 -
+  ls_zfi008t2-ksl06.
+  <fs_zfi008t2_product_cost>-ksl07 = <fs_zfi008t2_product_cost>-ksl07 -
+  ls_zfi008t2-ksl07.
+  <fs_zfi008t2_product_cost>-ksl08 = <fs_zfi008t2_product_cost>-ksl08 -
+  ls_zfi008t2-ksl08.
+  <fs_zfi008t2_product_cost>-ksl09 = <fs_zfi008t2_product_cost>-ksl09 -
+  ls_zfi008t2-ksl09.
+  <fs_zfi008t2_product_cost>-ksl10 = <fs_zfi008t2_product_cost>-ksl10 -
+  ls_zfi008t2-ksl10.
+  <fs_zfi008t2_product_cost>-ksl11 = <fs_zfi008t2_product_cost>-ksl11 -
+  ls_zfi008t2-ksl11.
+  <fs_zfi008t2_product_cost>-ksl12 = <fs_zfi008t2_product_cost>-ksl12 -
+  ls_zfi008t2-ksl12.
+  <fs_zfi008t2_product_cost>-ksl_sum =
+  <fs_zfi008t2_product_cost>-ksl_sum - ls_zfi008t2-ksl_sum.
+  <fs_zfi008t2_product_cost>-ksl_average =
+  <fs_zfi008t2_product_cost>-ksl_average - ls_zfi008t2-ksl_average.
+
+  READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-其他(盤盈虧、報廢及呆滯提列)'
+    INTO ls_zfi008t2.
+
+  <fs_zfi008t2_product_cost>-ksl01 = <fs_zfi008t2_product_cost>-ksl01 -
+  ls_zfi008t2-ksl01.
+  <fs_zfi008t2_product_cost>-ksl02 = <fs_zfi008t2_product_cost>-ksl02 -
+  ls_zfi008t2-ksl02.
+  <fs_zfi008t2_product_cost>-ksl03 = <fs_zfi008t2_product_cost>-ksl03 -
+  ls_zfi008t2-ksl03.
+  <fs_zfi008t2_product_cost>-ksl04 = <fs_zfi008t2_product_cost>-ksl04 -
+  ls_zfi008t2-ksl04.
+  <fs_zfi008t2_product_cost>-ksl05 = <fs_zfi008t2_product_cost>-ksl05 -
+  ls_zfi008t2-ksl05.
+  <fs_zfi008t2_product_cost>-ksl06 = <fs_zfi008t2_product_cost>-ksl06 -
+  ls_zfi008t2-ksl06.
+  <fs_zfi008t2_product_cost>-ksl07 = <fs_zfi008t2_product_cost>-ksl07 -
+  ls_zfi008t2-ksl07.
+  <fs_zfi008t2_product_cost>-ksl08 = <fs_zfi008t2_product_cost>-ksl08 -
+  ls_zfi008t2-ksl08.
+  <fs_zfi008t2_product_cost>-ksl09 = <fs_zfi008t2_product_cost>-ksl09 -
+  ls_zfi008t2-ksl09.
+  <fs_zfi008t2_product_cost>-ksl10 = <fs_zfi008t2_product_cost>-ksl10 -
+  ls_zfi008t2-ksl10.
+  <fs_zfi008t2_product_cost>-ksl11 = <fs_zfi008t2_product_cost>-ksl11 -
+  ls_zfi008t2-ksl11.
+  <fs_zfi008t2_product_cost>-ksl12 = <fs_zfi008t2_product_cost>-ksl12 -
+  ls_zfi008t2-ksl12.
+  <fs_zfi008t2_product_cost>-ksl_sum =
+  <fs_zfi008t2_product_cost>-ksl_sum - ls_zfi008t2-ksl_sum.
+  <fs_zfi008t2_product_cost>-ksl_average =
+  <fs_zfi008t2_product_cost>-ksl_average - ls_zfi008t2-ksl_average.
+
+ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                           計算毛利率 --產品
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_operation_profit.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    "  B4(營業收入淨額)-B8(銷貨成本-產品)
+    "  - B12 (銷貨成本-其他(盤盈虧、報廢及呆滯提列))
+    "  - B13 (銷貨成本-研發-技術開發費轉入)
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業毛利'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_operation_profit>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業收入淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_operation_profit>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_operation_profit>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_operation_profit>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_operation_profit>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_operation_profit>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_operation_profit>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_operation_profit>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_operation_profit>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_operation_profit>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_operation_profit>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_operation_profit>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_operation_profit>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_operation_profit>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_operation_profit>-ksl_average = ls_zfi008t2-ksl_average
+    .
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-其他(盤盈虧、報廢及呆滯提列)'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_operation_profit>-ksl01 =
+    <fs_zfi008t2_operation_profit>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_operation_profit>-ksl02 =
+    <fs_zfi008t2_operation_profit>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_operation_profit>-ksl03 =
+    <fs_zfi008t2_operation_profit>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_operation_profit>-ksl04 =
+    <fs_zfi008t2_operation_profit>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_operation_profit>-ksl05 =
+    <fs_zfi008t2_operation_profit>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_operation_profit>-ksl06 =
+    <fs_zfi008t2_operation_profit>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_operation_profit>-ksl07 =
+    <fs_zfi008t2_operation_profit>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_operation_profit>-ksl08 =
+    <fs_zfi008t2_operation_profit>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_operation_profit>-ksl09 =
+    <fs_zfi008t2_operation_profit>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_operation_profit>-ksl10 =
+    <fs_zfi008t2_operation_profit>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_operation_profit>-ksl11 =
+    <fs_zfi008t2_operation_profit>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_operation_profit>-ksl12 =
+    <fs_zfi008t2_operation_profit>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_operation_profit>-ksl_sum =
+    <fs_zfi008t2_operation_profit>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_operation_profit>-ksl_average =
+    <fs_zfi008t2_operation_profit>-ksl_average - ls_zfi008t2-ksl_average
+    .
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-研發-技術開發費轉入'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_operation_profit>-ksl01 =
+    <fs_zfi008t2_operation_profit>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_operation_profit>-ksl02 =
+    <fs_zfi008t2_operation_profit>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_operation_profit>-ksl03 =
+    <fs_zfi008t2_operation_profit>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_operation_profit>-ksl04 =
+    <fs_zfi008t2_operation_profit>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_operation_profit>-ksl05 =
+    <fs_zfi008t2_operation_profit>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_operation_profit>-ksl06 =
+    <fs_zfi008t2_operation_profit>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_operation_profit>-ksl07 =
+    <fs_zfi008t2_operation_profit>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_operation_profit>-ksl08 =
+    <fs_zfi008t2_operation_profit>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_operation_profit>-ksl09 =
+    <fs_zfi008t2_operation_profit>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_operation_profit>-ksl10 =
+    <fs_zfi008t2_operation_profit>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_operation_profit>-ksl11 =
+    <fs_zfi008t2_operation_profit>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_operation_profit>-ksl12 =
+    <fs_zfi008t2_operation_profit>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_operation_profit>-ksl_sum =
+    <fs_zfi008t2_operation_profit>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_operation_profit>-ksl_average =
+    <fs_zfi008t2_operation_profit>-ksl_average - ls_zfi008t2-ksl_average
+    .
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-產品'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_operation_profit>-ksl01 =
+    <fs_zfi008t2_operation_profit>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_operation_profit>-ksl02 =
+    <fs_zfi008t2_operation_profit>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_operation_profit>-ksl03 =
+    <fs_zfi008t2_operation_profit>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_operation_profit>-ksl04 =
+    <fs_zfi008t2_operation_profit>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_operation_profit>-ksl05 =
+    <fs_zfi008t2_operation_profit>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_operation_profit>-ksl06 =
+    <fs_zfi008t2_operation_profit>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_operation_profit>-ksl07 =
+    <fs_zfi008t2_operation_profit>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_operation_profit>-ksl08 =
+    <fs_zfi008t2_operation_profit>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_operation_profit>-ksl09 =
+    <fs_zfi008t2_operation_profit>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_operation_profit>-ksl10 =
+    <fs_zfi008t2_operation_profit>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_operation_profit>-ksl11 =
+    <fs_zfi008t2_operation_profit>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_operation_profit>-ksl12 =
+    <fs_zfi008t2_operation_profit>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_operation_profit>-ksl_sum =
+    <fs_zfi008t2_operation_profit>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_operation_profit>-ksl_average =
+    <fs_zfi008t2_operation_profit>-ksl_average - ls_zfi008t2-ksl_average
+    .
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                          計算毛利率 --產品
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_gross_profit.
+"B5(產品收入) + B7(內部計價) - B9(產品成本) - B10  (內部計價成本) /  ABS( B5(產品收入) +
+"B7(內部計價) )
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2,
+          ls_zfi008t2_tmp LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '           毛利率---產品'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_gross_profit>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品收入'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_gross_profit>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_gross_profit>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_gross_profit>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_gross_profit>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_gross_profit>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_gross_profit>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_gross_profit>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_gross_profit>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_gross_profit>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_gross_profit>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_gross_profit>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_gross_profit>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_gross_profit>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_gross_profit>-ksl_average = ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---內部計價'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_gross_profit>-ksl01 = <fs_zfi008t2_gross_profit>-ksl01
+    + ls_zfi008t2-ksl01.
+    <fs_zfi008t2_gross_profit>-ksl02 = <fs_zfi008t2_gross_profit>-ksl02
+    + ls_zfi008t2-ksl02.
+    <fs_zfi008t2_gross_profit>-ksl03 = <fs_zfi008t2_gross_profit>-ksl03
+    + ls_zfi008t2-ksl03.
+    <fs_zfi008t2_gross_profit>-ksl04 = <fs_zfi008t2_gross_profit>-ksl04
+    + ls_zfi008t2-ksl04.
+    <fs_zfi008t2_gross_profit>-ksl05 = <fs_zfi008t2_gross_profit>-ksl05
+    + ls_zfi008t2-ksl05.
+    <fs_zfi008t2_gross_profit>-ksl06 = <fs_zfi008t2_gross_profit>-ksl06
+    + ls_zfi008t2-ksl06.
+    <fs_zfi008t2_gross_profit>-ksl07 = <fs_zfi008t2_gross_profit>-ksl07
+    + ls_zfi008t2-ksl07.
+    <fs_zfi008t2_gross_profit>-ksl08 = <fs_zfi008t2_gross_profit>-ksl08
+    + ls_zfi008t2-ksl08.
+    <fs_zfi008t2_gross_profit>-ksl09 = <fs_zfi008t2_gross_profit>-ksl09
+    + ls_zfi008t2-ksl09.
+    <fs_zfi008t2_gross_profit>-ksl10 = <fs_zfi008t2_gross_profit>-ksl10
+    + ls_zfi008t2-ksl10.
+    <fs_zfi008t2_gross_profit>-ksl11 = <fs_zfi008t2_gross_profit>-ksl11
+    + ls_zfi008t2-ksl11.
+    <fs_zfi008t2_gross_profit>-ksl12 = <fs_zfi008t2_gross_profit>-ksl12
+    + ls_zfi008t2-ksl12.
+    <fs_zfi008t2_gross_profit>-ksl_sum =
+    <fs_zfi008t2_gross_profit>-ksl_sum + ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_gross_profit>-ksl_average =
+    <fs_zfi008t2_gross_profit>-ksl_average + ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品成本'
+        INTO ls_zfi008t2.
+
+    <fs_zfi008t2_gross_profit>-ksl01 = <fs_zfi008t2_gross_profit>-ksl01
+    - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_gross_profit>-ksl02 = <fs_zfi008t2_gross_profit>-ksl02
+    - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_gross_profit>-ksl03 = <fs_zfi008t2_gross_profit>-ksl03
+    - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_gross_profit>-ksl04 = <fs_zfi008t2_gross_profit>-ksl04
+    - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_gross_profit>-ksl05 = <fs_zfi008t2_gross_profit>-ksl05
+    - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_gross_profit>-ksl06 = <fs_zfi008t2_gross_profit>-ksl06
+    - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_gross_profit>-ksl07 = <fs_zfi008t2_gross_profit>-ksl07
+    - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_gross_profit>-ksl08 = <fs_zfi008t2_gross_profit>-ksl08
+    - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_gross_profit>-ksl09 = <fs_zfi008t2_gross_profit>-ksl09
+    - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_gross_profit>-ksl10 = <fs_zfi008t2_gross_profit>-ksl10
+    - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_gross_profit>-ksl11 = <fs_zfi008t2_gross_profit>-ksl11
+    - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_gross_profit>-ksl12 = <fs_zfi008t2_gross_profit>-ksl12
+    - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_gross_profit>-ksl_sum =
+    <fs_zfi008t2_gross_profit>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_gross_profit>-ksl_average =
+    <fs_zfi008t2_gross_profit>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---內部計價成本'
+        INTO ls_zfi008t2.
+
+    <fs_zfi008t2_gross_profit>-ksl01 = <fs_zfi008t2_gross_profit>-ksl01
+    - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_gross_profit>-ksl02 = <fs_zfi008t2_gross_profit>-ksl02
+    - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_gross_profit>-ksl03 = <fs_zfi008t2_gross_profit>-ksl03
+    - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_gross_profit>-ksl04 = <fs_zfi008t2_gross_profit>-ksl04
+    - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_gross_profit>-ksl05 = <fs_zfi008t2_gross_profit>-ksl05
+    - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_gross_profit>-ksl06 = <fs_zfi008t2_gross_profit>-ksl06
+    - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_gross_profit>-ksl07 = <fs_zfi008t2_gross_profit>-ksl07
+    - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_gross_profit>-ksl08 = <fs_zfi008t2_gross_profit>-ksl08
+    - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_gross_profit>-ksl09 = <fs_zfi008t2_gross_profit>-ksl09
+    - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_gross_profit>-ksl10 = <fs_zfi008t2_gross_profit>-ksl10
+    - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_gross_profit>-ksl11 = <fs_zfi008t2_gross_profit>-ksl11
+    - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_gross_profit>-ksl12 = <fs_zfi008t2_gross_profit>-ksl12
+    - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_gross_profit>-ksl_sum =
+    <fs_zfi008t2_gross_profit>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_gross_profit>-ksl_average =
+    <fs_zfi008t2_gross_profit>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---產品收入'
+      INTO ls_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---內部計價'
+      INTO ls_zfi008t2_tmp.
+    "   ABS( B5(產品收入) + B7(內部計價) )
+    ls_zfi008t2-ksl01 = abs( ls_zfi008t2-ksl01 + ls_zfi008t2_tmp-ksl01 )
+    .
+    ls_zfi008t2-ksl02 = abs( ls_zfi008t2-ksl02 + ls_zfi008t2_tmp-ksl02 )
+    .
+    ls_zfi008t2-ksl03 = abs( ls_zfi008t2-ksl03 + ls_zfi008t2_tmp-ksl03 )
+    .
+    ls_zfi008t2-ksl04 = abs( ls_zfi008t2-ksl04 + ls_zfi008t2_tmp-ksl04 )
+    .
+    ls_zfi008t2-ksl05 = abs( ls_zfi008t2-ksl05 + ls_zfi008t2_tmp-ksl05 )
+    .
+    ls_zfi008t2-ksl06 = abs( ls_zfi008t2-ksl06 + ls_zfi008t2_tmp-ksl06 )
+    .
+    ls_zfi008t2-ksl07 = abs( ls_zfi008t2-ksl07 + ls_zfi008t2_tmp-ksl07 )
+    .
+    ls_zfi008t2-ksl08 = abs( ls_zfi008t2-ksl08 + ls_zfi008t2_tmp-ksl08 )
+    .
+    ls_zfi008t2-ksl09 = abs( ls_zfi008t2-ksl09 + ls_zfi008t2_tmp-ksl09 )
+    .
+    ls_zfi008t2-ksl10 = abs( ls_zfi008t2-ksl10 + ls_zfi008t2_tmp-ksl10 )
+    .
+    ls_zfi008t2-ksl11 = abs( ls_zfi008t2-ksl11 + ls_zfi008t2_tmp-ksl11 )
+    .
+    ls_zfi008t2-ksl12 = abs( ls_zfi008t2-ksl12 + ls_zfi008t2_tmp-ksl12 )
+    .
+    ls_zfi008t2-ksl_sum = abs( ls_zfi008t2-ksl_sum +
+    ls_zfi008t2_tmp-ksl_sum ).
+    ls_zfi008t2-ksl_average = abs( ls_zfi008t2-ksl_average +
+    ls_zfi008t2_tmp-ksl_average ).
+
+    <fs_zfi008t2_gross_profit>-ksl01 = (
+    <fs_zfi008t2_gross_profit>-ksl01 * 100 ) / ls_zfi008t2-ksl01.
+    <fs_zfi008t2_gross_profit>-ksl02 = (
+    <fs_zfi008t2_gross_profit>-ksl02 * 100 ) / ls_zfi008t2-ksl02.
+    <fs_zfi008t2_gross_profit>-ksl03 = (
+    <fs_zfi008t2_gross_profit>-ksl03 * 100 ) / ls_zfi008t2-ksl03.
+    <fs_zfi008t2_gross_profit>-ksl04 = (
+    <fs_zfi008t2_gross_profit>-ksl04 * 100 ) / ls_zfi008t2-ksl04.
+    <fs_zfi008t2_gross_profit>-ksl05 = (
+    <fs_zfi008t2_gross_profit>-ksl05 * 100 ) / ls_zfi008t2-ksl05.
+    <fs_zfi008t2_gross_profit>-ksl06 = (
+    <fs_zfi008t2_gross_profit>-ksl06 * 100 ) / ls_zfi008t2-ksl06.
+    <fs_zfi008t2_gross_profit>-ksl07 = (
+    <fs_zfi008t2_gross_profit>-ksl07 * 100 ) / ls_zfi008t2-ksl07.
+    <fs_zfi008t2_gross_profit>-ksl08 = (
+    <fs_zfi008t2_gross_profit>-ksl08 * 100 ) / ls_zfi008t2-ksl08.
+    <fs_zfi008t2_gross_profit>-ksl09 = (
+    <fs_zfi008t2_gross_profit>-ksl09 * 100 ) / ls_zfi008t2-ksl09.
+    <fs_zfi008t2_gross_profit>-ksl10 = (
+    <fs_zfi008t2_gross_profit>-ksl10 * 100 ) / ls_zfi008t2-ksl10.
+    <fs_zfi008t2_gross_profit>-ksl11 = (
+    <fs_zfi008t2_gross_profit>-ksl11 * 100 ) / ls_zfi008t2-ksl11.
+    <fs_zfi008t2_gross_profit>-ksl12 = (
+    <fs_zfi008t2_gross_profit>-ksl12 * 100 ) / ls_zfi008t2-ksl12.
+    <fs_zfi008t2_gross_profit>-ksl_sum = (
+    <fs_zfi008t2_gross_profit>-ksl_sum * 100 ) / ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_gross_profit>-ksl_average = (
+    <fs_zfi008t2_gross_profit>-ksl_average * 100 ) /
+    ls_zfi008t2-ksl_average.
+
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                   計算毛利率 -全部(含模治具)
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_gross_profit_mold.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    " B14(營業毛利) / ABS(B4) (營業收入淨額)
+    READ TABLE gt_zfi008t2 WITH KEY description =
+    '                       ---全部(含模治具)'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_profit_mold>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業毛利'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_profit_mold>-ksl01 = ls_zfi008t2-ksl01 * 100.
+    <fs_zfi008t2_profit_mold>-ksl02 = ls_zfi008t2-ksl02 * 100.
+    <fs_zfi008t2_profit_mold>-ksl03 = ls_zfi008t2-ksl03 * 100.
+    <fs_zfi008t2_profit_mold>-ksl04 = ls_zfi008t2-ksl04 * 100.
+    <fs_zfi008t2_profit_mold>-ksl05 = ls_zfi008t2-ksl05 * 100.
+    <fs_zfi008t2_profit_mold>-ksl06 = ls_zfi008t2-ksl06 * 100.
+    <fs_zfi008t2_profit_mold>-ksl07 = ls_zfi008t2-ksl07 * 100.
+    <fs_zfi008t2_profit_mold>-ksl08 = ls_zfi008t2-ksl08 * 100.
+    <fs_zfi008t2_profit_mold>-ksl09 = ls_zfi008t2-ksl09 * 100.
+    <fs_zfi008t2_profit_mold>-ksl10 = ls_zfi008t2-ksl10 * 100.
+    <fs_zfi008t2_profit_mold>-ksl11 = ls_zfi008t2-ksl11 * 100.
+    <fs_zfi008t2_profit_mold>-ksl12 = ls_zfi008t2-ksl12 * 100.
+    <fs_zfi008t2_profit_mold>-ksl_sum = ls_zfi008t2-ksl_sum * 100.
+    <fs_zfi008t2_profit_mold>-ksl_average = ls_zfi008t2-ksl_average *
+    100.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業收入淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_profit_mold>-ksl01 = <fs_zfi008t2_profit_mold>-ksl01 /
+    abs( ls_zfi008t2-ksl01 ).
+    <fs_zfi008t2_profit_mold>-ksl02 = <fs_zfi008t2_profit_mold>-ksl02 /
+    abs( ls_zfi008t2-ksl02 ).
+    <fs_zfi008t2_profit_mold>-ksl03 = <fs_zfi008t2_profit_mold>-ksl03 /
+    abs( ls_zfi008t2-ksl03 ).
+    <fs_zfi008t2_profit_mold>-ksl04 = <fs_zfi008t2_profit_mold>-ksl04 /
+    abs( ls_zfi008t2-ksl04 ).
+    <fs_zfi008t2_profit_mold>-ksl05 = <fs_zfi008t2_profit_mold>-ksl05 /
+    abs( ls_zfi008t2-ksl05 ).
+    <fs_zfi008t2_profit_mold>-ksl06 = <fs_zfi008t2_profit_mold>-ksl06 /
+    abs( ls_zfi008t2-ksl06 ).
+    <fs_zfi008t2_profit_mold>-ksl07 = <fs_zfi008t2_profit_mold>-ksl07 /
+    abs( ls_zfi008t2-ksl07 ).
+    <fs_zfi008t2_profit_mold>-ksl08 = <fs_zfi008t2_profit_mold>-ksl08 /
+    abs( ls_zfi008t2-ksl08 ).
+    <fs_zfi008t2_profit_mold>-ksl09 = <fs_zfi008t2_profit_mold>-ksl09 /
+    abs( ls_zfi008t2-ksl09 ).
+    <fs_zfi008t2_profit_mold>-ksl10 = <fs_zfi008t2_profit_mold>-ksl10 /
+    abs( ls_zfi008t2-ksl10 ).
+    <fs_zfi008t2_profit_mold>-ksl11 = <fs_zfi008t2_profit_mold>-ksl11 /
+    abs( ls_zfi008t2-ksl11 ).
+    <fs_zfi008t2_profit_mold>-ksl12 = <fs_zfi008t2_profit_mold>-ksl12 /
+    abs( ls_zfi008t2-ksl12 ).
+    <fs_zfi008t2_profit_mold>-ksl_sum =
+    <fs_zfi008t2_profit_mold>-ksl_sum / abs( ls_zfi008t2-ksl_sum ).
+    <fs_zfi008t2_profit_mold>-ksl_average =
+    <fs_zfi008t2_profit_mold>-ksl_average / abs( ls_zfi008t2-ksl_average
+    ).
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                   計算營業費用(不含共同)淨額
+*
+*&--------------------------------------------------------------------&
+  FORM callculate_operation_cost.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業費用(不含共同)淨額'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_operation_cost>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-研發-技術開發費轉入'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_operation_cost>-ksl01 =
+    <fs_zfi008t2_operation_cost>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_operation_cost>-ksl02 =
+    <fs_zfi008t2_operation_cost>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_operation_cost>-ksl03 =
+    <fs_zfi008t2_operation_cost>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_operation_cost>-ksl04 =
+    <fs_zfi008t2_operation_cost>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_operation_cost>-ksl05 =
+    <fs_zfi008t2_operation_cost>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_operation_cost>-ksl06 =
+    <fs_zfi008t2_operation_cost>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_operation_cost>-ksl07 =
+    <fs_zfi008t2_operation_cost>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_operation_cost>-ksl08 =
+    <fs_zfi008t2_operation_cost>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_operation_cost>-ksl09 =
+    <fs_zfi008t2_operation_cost>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_operation_cost>-ksl10 =
+    <fs_zfi008t2_operation_cost>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_operation_cost>-ksl11 =
+    <fs_zfi008t2_operation_cost>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_operation_cost>-ksl12 =
+    <fs_zfi008t2_operation_cost>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_operation_cost>-ksl_sum =
+    <fs_zfi008t2_operation_cost>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_operation_cost>-ksl_average =
+    <fs_zfi008t2_operation_cost>-ksl_average - ls_zfi008t2-ksl_average.
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                              計算研發費用
+*
+*&--------------------------------------------------------------------&
+  FORM callculate_research_cost.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---研發費用'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_research_cost>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '銷貨成本-研發-技術開發費轉入'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_research_cost>-ksl01 =
+    <fs_zfi008t2_research_cost>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_research_cost>-ksl02 =
+    <fs_zfi008t2_research_cost>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_research_cost>-ksl03 =
+    <fs_zfi008t2_research_cost>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_research_cost>-ksl04 =
+    <fs_zfi008t2_research_cost>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_research_cost>-ksl05 =
+    <fs_zfi008t2_research_cost>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_research_cost>-ksl06 =
+    <fs_zfi008t2_research_cost>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_research_cost>-ksl07 =
+    <fs_zfi008t2_research_cost>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_research_cost>-ksl08 =
+    <fs_zfi008t2_research_cost>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_research_cost>-ksl09 =
+    <fs_zfi008t2_research_cost>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_research_cost>-ksl10 =
+    <fs_zfi008t2_research_cost>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_research_cost>-ksl11 =
+    <fs_zfi008t2_research_cost>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_research_cost>-ksl12 =
+    <fs_zfi008t2_research_cost>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_research_cost>-ksl_sum =
+    <fs_zfi008t2_research_cost>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_research_cost>-ksl_average =
+    <fs_zfi008t2_research_cost>-ksl_average - ls_zfi008t2-ksl_average.
+
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                             計算其他管理費用
+*
+*&--------------------------------------------------------------------&
+  FORM callculate_other_manager_cost.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---其他管理費用'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_other_manager>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業費用(不含共同)淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_other_manager>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_other_manager>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_other_manager>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_other_manager>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_other_manager>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_other_manager>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_other_manager>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_other_manager>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_other_manager>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_other_manager>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_other_manager>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_other_manager>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_other_manager>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_other_manager>-ksl_average = ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---推銷費用'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_other_manager>-ksl01 =
+    <fs_zfi008t2_other_manager>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_other_manager>-ksl02 =
+    <fs_zfi008t2_other_manager>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_other_manager>-ksl03 =
+    <fs_zfi008t2_other_manager>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_other_manager>-ksl04 =
+    <fs_zfi008t2_other_manager>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_other_manager>-ksl05 =
+    <fs_zfi008t2_other_manager>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_other_manager>-ksl06 =
+    <fs_zfi008t2_other_manager>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_other_manager>-ksl07 =
+    <fs_zfi008t2_other_manager>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_other_manager>-ksl08 =
+    <fs_zfi008t2_other_manager>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_other_manager>-ksl09 =
+    <fs_zfi008t2_other_manager>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_other_manager>-ksl10 =
+    <fs_zfi008t2_other_manager>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_other_manager>-ksl11 =
+    <fs_zfi008t2_other_manager>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_other_manager>-ksl12 =
+    <fs_zfi008t2_other_manager>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_other_manager>-ksl_sum =
+    <fs_zfi008t2_other_manager>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_other_manager>-ksl_average =
+    <fs_zfi008t2_other_manager>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---AOLTEC+EG費用'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_other_manager>-ksl01 =
+    <fs_zfi008t2_other_manager>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_other_manager>-ksl02 =
+    <fs_zfi008t2_other_manager>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_other_manager>-ksl03 =
+    <fs_zfi008t2_other_manager>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_other_manager>-ksl04 =
+    <fs_zfi008t2_other_manager>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_other_manager>-ksl05 =
+    <fs_zfi008t2_other_manager>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_other_manager>-ksl06 =
+    <fs_zfi008t2_other_manager>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_other_manager>-ksl07 =
+    <fs_zfi008t2_other_manager>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_other_manager>-ksl08 =
+    <fs_zfi008t2_other_manager>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_other_manager>-ksl09 =
+    <fs_zfi008t2_other_manager>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_other_manager>-ksl10 =
+    <fs_zfi008t2_other_manager>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_other_manager>-ksl11 =
+    <fs_zfi008t2_other_manager>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_other_manager>-ksl12 =
+    <fs_zfi008t2_other_manager>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_other_manager>-ksl_sum =
+    <fs_zfi008t2_other_manager>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_other_manager>-ksl_average =
+    <fs_zfi008t2_other_manager>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '    ---研發費用'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_other_manager>-ksl01 =
+    <fs_zfi008t2_other_manager>-ksl01 - ls_zfi008t2-ksl01.
+    <fs_zfi008t2_other_manager>-ksl02 =
+    <fs_zfi008t2_other_manager>-ksl02 - ls_zfi008t2-ksl02.
+    <fs_zfi008t2_other_manager>-ksl03 =
+    <fs_zfi008t2_other_manager>-ksl03 - ls_zfi008t2-ksl03.
+    <fs_zfi008t2_other_manager>-ksl04 =
+    <fs_zfi008t2_other_manager>-ksl04 - ls_zfi008t2-ksl04.
+    <fs_zfi008t2_other_manager>-ksl05 =
+    <fs_zfi008t2_other_manager>-ksl05 - ls_zfi008t2-ksl05.
+    <fs_zfi008t2_other_manager>-ksl06 =
+    <fs_zfi008t2_other_manager>-ksl06 - ls_zfi008t2-ksl06.
+    <fs_zfi008t2_other_manager>-ksl07 =
+    <fs_zfi008t2_other_manager>-ksl07 - ls_zfi008t2-ksl07.
+    <fs_zfi008t2_other_manager>-ksl08 =
+    <fs_zfi008t2_other_manager>-ksl08 - ls_zfi008t2-ksl08.
+    <fs_zfi008t2_other_manager>-ksl09 =
+    <fs_zfi008t2_other_manager>-ksl09 - ls_zfi008t2-ksl09.
+    <fs_zfi008t2_other_manager>-ksl10 =
+    <fs_zfi008t2_other_manager>-ksl10 - ls_zfi008t2-ksl10.
+    <fs_zfi008t2_other_manager>-ksl11 =
+    <fs_zfi008t2_other_manager>-ksl11 - ls_zfi008t2-ksl11.
+    <fs_zfi008t2_other_manager>-ksl12 =
+    <fs_zfi008t2_other_manager>-ksl12 - ls_zfi008t2-ksl12.
+    <fs_zfi008t2_other_manager>-ksl_sum =
+    <fs_zfi008t2_other_manager>-ksl_sum - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_other_manager>-ksl_average =
+    <fs_zfi008t2_other_manager>-ksl_average - ls_zfi008t2-ksl_average.
+
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                               計算營業淨利
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_net_operating_profit.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業淨利'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_net_profit>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業毛利'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_net_profit>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_net_profit>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_net_profit>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_net_profit>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_net_profit>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_net_profit>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_net_profit>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_net_profit>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_net_profit>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_net_profit>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_net_profit>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_net_profit>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_net_profit>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_net_profit>-ksl_average = ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業費用(不含共同)淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_net_profit>-ksl01 = <fs_zfi008t2_net_profit>-ksl01 -
+    ls_zfi008t2-ksl01.
+    <fs_zfi008t2_net_profit>-ksl02 = <fs_zfi008t2_net_profit>-ksl02 -
+    ls_zfi008t2-ksl02.
+    <fs_zfi008t2_net_profit>-ksl03 = <fs_zfi008t2_net_profit>-ksl03 -
+    ls_zfi008t2-ksl03.
+    <fs_zfi008t2_net_profit>-ksl04 = <fs_zfi008t2_net_profit>-ksl04 -
+    ls_zfi008t2-ksl04.
+    <fs_zfi008t2_net_profit>-ksl05 = <fs_zfi008t2_net_profit>-ksl05 -
+    ls_zfi008t2-ksl05.
+    <fs_zfi008t2_net_profit>-ksl06 = <fs_zfi008t2_net_profit>-ksl06 -
+    ls_zfi008t2-ksl06.
+    <fs_zfi008t2_net_profit>-ksl07 = <fs_zfi008t2_net_profit>-ksl07 -
+    ls_zfi008t2-ksl07.
+    <fs_zfi008t2_net_profit>-ksl08 = <fs_zfi008t2_net_profit>-ksl08 -
+    ls_zfi008t2-ksl08.
+    <fs_zfi008t2_net_profit>-ksl09 = <fs_zfi008t2_net_profit>-ksl09 -
+    ls_zfi008t2-ksl09.
+    <fs_zfi008t2_net_profit>-ksl10 = <fs_zfi008t2_net_profit>-ksl10 -
+    ls_zfi008t2-ksl10.
+    <fs_zfi008t2_net_profit>-ksl11 = <fs_zfi008t2_net_profit>-ksl11 -
+    ls_zfi008t2-ksl11.
+    <fs_zfi008t2_net_profit>-ksl12 = <fs_zfi008t2_net_profit>-ksl12 -
+    ls_zfi008t2-ksl12.
+    <fs_zfi008t2_net_profit>-ksl_sum = <fs_zfi008t2_net_profit>-ksl_sum
+    - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_net_profit>-ksl_average =
+    <fs_zfi008t2_net_profit>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業費用(共同及績效)'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_net_profit>-ksl01 = <fs_zfi008t2_net_profit>-ksl01 -
+    ls_zfi008t2-ksl01.
+    <fs_zfi008t2_net_profit>-ksl02 = <fs_zfi008t2_net_profit>-ksl02 -
+    ls_zfi008t2-ksl02.
+    <fs_zfi008t2_net_profit>-ksl03 = <fs_zfi008t2_net_profit>-ksl03 -
+    ls_zfi008t2-ksl03.
+    <fs_zfi008t2_net_profit>-ksl04 = <fs_zfi008t2_net_profit>-ksl04 -
+    ls_zfi008t2-ksl04.
+    <fs_zfi008t2_net_profit>-ksl05 = <fs_zfi008t2_net_profit>-ksl05 -
+    ls_zfi008t2-ksl05.
+    <fs_zfi008t2_net_profit>-ksl06 = <fs_zfi008t2_net_profit>-ksl06 -
+    ls_zfi008t2-ksl06.
+    <fs_zfi008t2_net_profit>-ksl07 = <fs_zfi008t2_net_profit>-ksl07 -
+    ls_zfi008t2-ksl07.
+    <fs_zfi008t2_net_profit>-ksl08 = <fs_zfi008t2_net_profit>-ksl08 -
+    ls_zfi008t2-ksl08.
+    <fs_zfi008t2_net_profit>-ksl09 = <fs_zfi008t2_net_profit>-ksl09 -
+    ls_zfi008t2-ksl09.
+    <fs_zfi008t2_net_profit>-ksl10 = <fs_zfi008t2_net_profit>-ksl10 -
+    ls_zfi008t2-ksl10.
+    <fs_zfi008t2_net_profit>-ksl11 = <fs_zfi008t2_net_profit>-ksl11 -
+    ls_zfi008t2-ksl11.
+    <fs_zfi008t2_net_profit>-ksl12 = <fs_zfi008t2_net_profit>-ksl12 -
+    ls_zfi008t2-ksl12.
+    <fs_zfi008t2_net_profit>-ksl_sum = <fs_zfi008t2_net_profit>-ksl_sum
+    - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_net_profit>-ksl_average =
+    <fs_zfi008t2_net_profit>-ksl_average - ls_zfi008t2-ksl_average.
+
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                               計算稅前淨利
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_profit_before_tax.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '稅前淨利'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_before_tax>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業淨利'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_before_tax>-ksl01 = ls_zfi008t2-ksl01.
+    <fs_zfi008t2_before_tax>-ksl02 = ls_zfi008t2-ksl02.
+    <fs_zfi008t2_before_tax>-ksl03 = ls_zfi008t2-ksl03.
+    <fs_zfi008t2_before_tax>-ksl04 = ls_zfi008t2-ksl04.
+    <fs_zfi008t2_before_tax>-ksl05 = ls_zfi008t2-ksl05.
+    <fs_zfi008t2_before_tax>-ksl06 = ls_zfi008t2-ksl06.
+    <fs_zfi008t2_before_tax>-ksl07 = ls_zfi008t2-ksl07.
+    <fs_zfi008t2_before_tax>-ksl08 = ls_zfi008t2-ksl08.
+    <fs_zfi008t2_before_tax>-ksl09 = ls_zfi008t2-ksl09.
+    <fs_zfi008t2_before_tax>-ksl10 = ls_zfi008t2-ksl10.
+    <fs_zfi008t2_before_tax>-ksl11 = ls_zfi008t2-ksl11.
+    <fs_zfi008t2_before_tax>-ksl12 = ls_zfi008t2-ksl12.
+    <fs_zfi008t2_before_tax>-ksl_sum = ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_before_tax>-ksl_average = ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業外(收益)及費用(不含共同)'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_before_tax>-ksl01 = <fs_zfi008t2_before_tax>-ksl01 -
+    ls_zfi008t2-ksl01.
+    <fs_zfi008t2_before_tax>-ksl02 = <fs_zfi008t2_before_tax>-ksl02 -
+    ls_zfi008t2-ksl02.
+    <fs_zfi008t2_before_tax>-ksl03 = <fs_zfi008t2_before_tax>-ksl03 -
+    ls_zfi008t2-ksl03.
+    <fs_zfi008t2_before_tax>-ksl04 = <fs_zfi008t2_before_tax>-ksl04 -
+    ls_zfi008t2-ksl04.
+    <fs_zfi008t2_before_tax>-ksl05 = <fs_zfi008t2_before_tax>-ksl05 -
+    ls_zfi008t2-ksl05.
+    <fs_zfi008t2_before_tax>-ksl06 = <fs_zfi008t2_before_tax>-ksl06 -
+    ls_zfi008t2-ksl06.
+    <fs_zfi008t2_before_tax>-ksl07 = <fs_zfi008t2_before_tax>-ksl07 -
+    ls_zfi008t2-ksl07.
+    <fs_zfi008t2_before_tax>-ksl08 = <fs_zfi008t2_before_tax>-ksl08 -
+    ls_zfi008t2-ksl08.
+    <fs_zfi008t2_before_tax>-ksl09 = <fs_zfi008t2_before_tax>-ksl09 -
+    ls_zfi008t2-ksl09.
+    <fs_zfi008t2_before_tax>-ksl10 = <fs_zfi008t2_before_tax>-ksl10 -
+    ls_zfi008t2-ksl10.
+    <fs_zfi008t2_before_tax>-ksl11 = <fs_zfi008t2_before_tax>-ksl11 -
+    ls_zfi008t2-ksl11.
+    <fs_zfi008t2_before_tax>-ksl12 = <fs_zfi008t2_before_tax>-ksl12 -
+    ls_zfi008t2-ksl12.
+    <fs_zfi008t2_before_tax>-ksl_sum = <fs_zfi008t2_before_tax>-ksl_sum
+    - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_before_tax>-ksl_average =
+    <fs_zfi008t2_before_tax>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '分攤共同營業外(收入)費用-可控'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_before_tax>-ksl01 = <fs_zfi008t2_before_tax>-ksl01 -
+    ls_zfi008t2-ksl01.
+    <fs_zfi008t2_before_tax>-ksl02 = <fs_zfi008t2_before_tax>-ksl02 -
+    ls_zfi008t2-ksl02.
+    <fs_zfi008t2_before_tax>-ksl03 = <fs_zfi008t2_before_tax>-ksl03 -
+    ls_zfi008t2-ksl03.
+    <fs_zfi008t2_before_tax>-ksl04 = <fs_zfi008t2_before_tax>-ksl04 -
+    ls_zfi008t2-ksl04.
+    <fs_zfi008t2_before_tax>-ksl05 = <fs_zfi008t2_before_tax>-ksl05 -
+    ls_zfi008t2-ksl05.
+    <fs_zfi008t2_before_tax>-ksl06 = <fs_zfi008t2_before_tax>-ksl06 -
+    ls_zfi008t2-ksl06.
+    <fs_zfi008t2_before_tax>-ksl07 = <fs_zfi008t2_before_tax>-ksl07 -
+    ls_zfi008t2-ksl07.
+    <fs_zfi008t2_before_tax>-ksl08 = <fs_zfi008t2_before_tax>-ksl08 -
+    ls_zfi008t2-ksl08.
+    <fs_zfi008t2_before_tax>-ksl09 = <fs_zfi008t2_before_tax>-ksl09 -
+    ls_zfi008t2-ksl09.
+    <fs_zfi008t2_before_tax>-ksl10 = <fs_zfi008t2_before_tax>-ksl10 -
+    ls_zfi008t2-ksl10.
+    <fs_zfi008t2_before_tax>-ksl11 = <fs_zfi008t2_before_tax>-ksl11 -
+    ls_zfi008t2-ksl11.
+    <fs_zfi008t2_before_tax>-ksl12 = <fs_zfi008t2_before_tax>-ksl12 -
+    ls_zfi008t2-ksl12.
+    <fs_zfi008t2_before_tax>-ksl_sum = <fs_zfi008t2_before_tax>-ksl_sum
+    - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_before_tax>-ksl_average =
+    <fs_zfi008t2_before_tax>-ksl_average - ls_zfi008t2-ksl_average.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '分攤共同營業外(收入)費用-不可控'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_before_tax>-ksl01 = <fs_zfi008t2_before_tax>-ksl01 -
+    ls_zfi008t2-ksl01.
+    <fs_zfi008t2_before_tax>-ksl02 = <fs_zfi008t2_before_tax>-ksl02 -
+    ls_zfi008t2-ksl02.
+    <fs_zfi008t2_before_tax>-ksl03 = <fs_zfi008t2_before_tax>-ksl03 -
+    ls_zfi008t2-ksl03.
+    <fs_zfi008t2_before_tax>-ksl04 = <fs_zfi008t2_before_tax>-ksl04 -
+    ls_zfi008t2-ksl04.
+    <fs_zfi008t2_before_tax>-ksl05 = <fs_zfi008t2_before_tax>-ksl05 -
+    ls_zfi008t2-ksl05.
+    <fs_zfi008t2_before_tax>-ksl06 = <fs_zfi008t2_before_tax>-ksl06 -
+    ls_zfi008t2-ksl06.
+    <fs_zfi008t2_before_tax>-ksl07 = <fs_zfi008t2_before_tax>-ksl07 -
+    ls_zfi008t2-ksl07.
+    <fs_zfi008t2_before_tax>-ksl08 = <fs_zfi008t2_before_tax>-ksl08 -
+    ls_zfi008t2-ksl08.
+    <fs_zfi008t2_before_tax>-ksl09 = <fs_zfi008t2_before_tax>-ksl09 -
+    ls_zfi008t2-ksl09.
+    <fs_zfi008t2_before_tax>-ksl10 = <fs_zfi008t2_before_tax>-ksl10 -
+    ls_zfi008t2-ksl10.
+    <fs_zfi008t2_before_tax>-ksl11 = <fs_zfi008t2_before_tax>-ksl11 -
+    ls_zfi008t2-ksl11.
+    <fs_zfi008t2_before_tax>-ksl12 = <fs_zfi008t2_before_tax>-ksl12 -
+    ls_zfi008t2-ksl12.
+    <fs_zfi008t2_before_tax>-ksl_sum = <fs_zfi008t2_before_tax>-ksl_sum
+    - ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_before_tax>-ksl_average =
+    <fs_zfi008t2_before_tax>-ksl_average - ls_zfi008t2-ksl_average.
+  ENDFORM.
+
+*&--------------------------------------------------------------------&
+*
+*                             計算稅前純益率
+*
+*&--------------------------------------------------------------------&
+  FORM calculate_pre_tax_income.
+    DATA: ls_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '        稅前純益率'
+      ASSIGNING FIELD-SYMBOL(<fs_zfi008t2_pre_tax_income>).
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '稅前淨利'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_pre_tax_income>-ksl01 = ls_zfi008t2-ksl01 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl02 = ls_zfi008t2-ksl02 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl03 = ls_zfi008t2-ksl03 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl04 = ls_zfi008t2-ksl04 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl05 = ls_zfi008t2-ksl05 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl06 = ls_zfi008t2-ksl06 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl07 = ls_zfi008t2-ksl07 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl08 = ls_zfi008t2-ksl08 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl09 = ls_zfi008t2-ksl09 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl10 = ls_zfi008t2-ksl10 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl11 = ls_zfi008t2-ksl11 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl12 = ls_zfi008t2-ksl12 * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl_sum = ls_zfi008t2-ksl_sum * 100.
+    <fs_zfi008t2_pre_tax_income>-ksl_average = ls_zfi008t2-ksl_average *
+    100.
+
+    READ TABLE gt_zfi008t2 WITH KEY description = '營業收入淨額'
+      INTO ls_zfi008t2.
+
+    <fs_zfi008t2_pre_tax_income>-ksl01 =
+    <fs_zfi008t2_pre_tax_income>-ksl01 / ls_zfi008t2-ksl01.
+    <fs_zfi008t2_pre_tax_income>-ksl02 =
+    <fs_zfi008t2_pre_tax_income>-ksl02 / ls_zfi008t2-ksl02.
+    <fs_zfi008t2_pre_tax_income>-ksl03 =
+    <fs_zfi008t2_pre_tax_income>-ksl03 / ls_zfi008t2-ksl03.
+    <fs_zfi008t2_pre_tax_income>-ksl04 =
+    <fs_zfi008t2_pre_tax_income>-ksl04 / ls_zfi008t2-ksl04.
+    <fs_zfi008t2_pre_tax_income>-ksl05 =
+    <fs_zfi008t2_pre_tax_income>-ksl05 / ls_zfi008t2-ksl05.
+    <fs_zfi008t2_pre_tax_income>-ksl06 =
+    <fs_zfi008t2_pre_tax_income>-ksl06 / ls_zfi008t2-ksl06.
+    <fs_zfi008t2_pre_tax_income>-ksl07 =
+    <fs_zfi008t2_pre_tax_income>-ksl07 / ls_zfi008t2-ksl07.
+    <fs_zfi008t2_pre_tax_income>-ksl08 =
+    <fs_zfi008t2_pre_tax_income>-ksl08 / ls_zfi008t2-ksl08.
+    <fs_zfi008t2_pre_tax_income>-ksl09 =
+    <fs_zfi008t2_pre_tax_income>-ksl09 / ls_zfi008t2-ksl09.
+    <fs_zfi008t2_pre_tax_income>-ksl10 =
+    <fs_zfi008t2_pre_tax_income>-ksl10 / ls_zfi008t2-ksl10.
+    <fs_zfi008t2_pre_tax_income>-ksl11 =
+    <fs_zfi008t2_pre_tax_income>-ksl11 / ls_zfi008t2-ksl11.
+    <fs_zfi008t2_pre_tax_income>-ksl12 =
+    <fs_zfi008t2_pre_tax_income>-ksl12 / ls_zfi008t2-ksl12.
+    <fs_zfi008t2_pre_tax_income>-ksl_sum =
+    <fs_zfi008t2_pre_tax_income>-ksl_sum / ls_zfi008t2-ksl_sum.
+    <fs_zfi008t2_pre_tax_income>-ksl_average =
+    <fs_zfi008t2_pre_tax_income>-ksl_average / ls_zfi008t2-ksl_average.
+  ENDFORM.

@@ -1,0 +1,100 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI008F1_TOP
+*&---------------------------------------------------------------------*
+
+TYPE-POOLS: soi, ole2.
+
+"  OLE 參數
+DATA:
+  lo_application TYPE  ole2_object,
+  lo_workbook    TYPE  ole2_object,
+  lo_workbooks   TYPE  ole2_object,
+  lo_range       TYPE  ole2_object,
+  lo_worksheet   TYPE  ole2_object,
+  lo_worksheets  TYPE  ole2_object,
+  lo_worksheet1  TYPE  ole2_object,
+  lo_worksheets1 TYPE  ole2_object,
+  lo_column      TYPE  ole2_object,
+  lo_row         TYPE  ole2_object,
+  lo_cell        TYPE  ole2_object,
+  lo_col         TYPE ole2_object,
+  lo_borders     TYPE ole2_object,
+  lo_int         TYPE ole2_object,
+  lo_font        TYPE ole2_object.
+
+DATA: lo_cellstart  TYPE ole2_object,
+      lo_cellend    TYPE ole2_object,
+      lo_selection  TYPE ole2_object,
+      lo_validation TYPE ole2_object.
+
+DATA:
+  lv_complete_path TYPE char256,
+  lv_titulo        TYPE string.
+
+DATA:
+  gv_werks TYPE acdoca-werks,
+  gv_tmp_str TYPE string,
+  gv_tsl TYPE acdoca-tsl,
+  gv_ksl01 TYPE acdoca-ksl,
+  gv_ksl02 TYPE acdoca-ksl,
+  gv_ksl03 TYPE acdoca-ksl,
+  gv_ksl04 TYPE acdoca-ksl,
+  gv_ksl05 TYPE acdoca-ksl,
+  gv_ksl06 TYPE acdoca-ksl,
+  gv_ksl07 TYPE acdoca-ksl,
+  gv_ksl08 TYPE acdoca-ksl,
+  gv_ksl09 TYPE acdoca-ksl,
+  gv_ksl10 TYPE acdoca-ksl,
+  gv_ksl11 TYPE acdoca-ksl,
+  gv_ksl12 TYPE acdoca-ksl,
+  gv_sum TYPE acdoca-ksl,
+  gv_average TYPE acdoca-ksl.
+
+DATA gv_prctr TYPE acdoca-prctr.
+
+DATA: gt_zfi008t2 TYPE STANDARD TABLE OF zfi008t2,
+      gs_zfi008t2 LIKE LINE OF gt_zfi008t2.
+
+RANGES: gr_prctr FOR acdoca-prctr,
+  gr_racct FOR acdoca-racct,
+  gr_bukrs FOR glpct-rbukrs,
+  gr_rfarea FOR glpct-rfarea.
+
+DATA: lv_tmp_value TYPE string,
+      lv_tmp_integer TYPE i.
+
+" OLE  Excel 表格輸入
+DEFINE cell.
+  CALL METHOD OF &1 'Cells' = lo_cell
+    EXPORTING
+      #1 = &2
+      #2 = &3.
+  SET PROPERTY OF lo_cell 'Value' = &4.
+  SET PROPERTY OF lo_cell 'HorizontalAlignment' = &5.
+  IF &6 EQ 'USD'.
+    IF &4 < 0 .
+      lv_tmp_integer = &4.
+      lv_tmp_integer = lv_tmp_integer * -1.
+      SET PROPERTY OF lo_cell 'Value' = lv_tmp_integer.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '(0,000.00)'.
+      GET PROPERTY OF lo_cell 'FONT' = lo_font.
+      SET PROPERTY OF lo_font 'ColorIndex' = 3.
+    ELSEIF &4 > 0.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '0,000.00'.
+    ENDIF.
+  ELSEIF &6 EQ 'TWD'.
+    IF &4 < 0 .
+      lv_tmp_integer = &4.
+      lv_tmp_integer = lv_tmp_integer * -1.
+      SET PROPERTY OF lo_cell 'Value' = lv_tmp_integer.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '(0,000)'.
+      GET PROPERTY OF lo_cell 'FONT' = lo_font.
+      SET PROPERTY OF lo_font 'ColorIndex' = 3.
+    ELSEIF &4 > 0.
+      SET PROPERTY OF lo_cell 'NumberFormat' = '0,000'.
+    ENDIF.
+  ELSEIF &6 EQ '%'.
+    SET PROPERTY OF lo_cell 'NumberFormat' = '0.00%'.
+  ENDIF.
+
+END-OF-DEFINITION.

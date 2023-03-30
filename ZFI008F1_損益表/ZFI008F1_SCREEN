@@ -1,0 +1,28 @@
+*&---------------------------------------------------------------------*
+*& INCLUDE          ZFI008F1_SCREEN
+*&---------------------------------------------------------------------*
+
+PARAMETERS:
+  p_gjahr TYPE acdoca-gjahr,
+  p_poper TYPE acdoca-poper,
+"  p_werks TYPE acdoca-werks,
+  p_prctr TYPE acdoca-prctr,
+  p_folder TYPE string.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_folder.
+  DATA str TYPE string.
+  CALL METHOD cl_gui_frontend_services=>directory_browse
+    EXPORTING
+      initial_folder  = 'C:\'
+    CHANGING
+      selected_folder = str
+    EXCEPTIONS
+      cntl_error      = 1
+      error_no_gui    = 2
+      OTHERS          = 3.
+  IF sy-subrc = 0.
+    CALL METHOD cl_gui_cfw=>flush( ).
+    IF NOT str IS INITIAL.
+      p_folder = str.
+    ENDIF.
+  ENDIF.
