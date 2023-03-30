@@ -1,2 +1,3 @@
-# SAP_Test
-SAP_Code_Test
+# SAP_ABAP_程式範例
+
+ABAP_Code
