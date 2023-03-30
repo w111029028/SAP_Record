@@ -1,0 +1,104 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZTIM_TEST15_STATUS_1200O01.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module STATUS_1200 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE status_1200 OUTPUT.
+  SET PF-STATUS 'STATUS'.
+* SET TITLEBAR 'xxx'.
+
+  PERFORM get_item_data.
+
+  CREATE OBJECT go_item
+    EXPORTING
+      container_name   =   'ITEM_CONT1'.
+
+  CREATE OBJECT go_item_alv
+    EXPORTING
+      i_parent   =   go_item.
+
+  IF gt_fieldcat_item IS INITIAL.
+    d_build_fieldcat:
+      gt_fieldcat_item 'GJAHR' '' '' '' '會計年度',
+      gt_fieldcat_item 'PERIO' '' '' '' '期間',
+      gt_fieldcat_item 'KOSTL' '' '' '' '成本中心',
+      gt_fieldcat_item 'TXT20' '' '' '' '項目',
+      gt_fieldcat_item 'WKGBTR' '' '' '' '金額'.
+  ENDIF.
+
+
+  CALL METHOD go_item_alv->set_table_for_first_display
+    CHANGING
+      it_outtab   =   gt_coep_item[]
+      it_fieldcatalog   =   gt_fieldcat_item.
+
+  DATA lv_title(40) TYPE c.
+  lv_title = gs_coep-kostl && ' 細項資料'.
+
+  CALL FUNCTION 'GFW_PRES_SHOW'
+    EXPORTING
+      container               = 'ITEM_CONT2'
+      presentation_type       = 7
+      header                  = lv_title
+    TABLES
+      values                  = gt_val_item
+      column_texts            = gt_col_item.
+
+  DATA: stbl TYPE lvc_s_stbl.
+  stbl-row = 'X'.
+  stbl-col = 'X'.
+
+  CALL METHOD go_item_alv->refresh_table_display
+    EXPORTING
+      is_stable = stbl
+      i_soft_refresh = space.
+
+ENDMODULE.
+
+FORM get_item_data.
+  FREE: gt_coep_item[], gt_val_item[], gs_val_item, gt_col_item.
+  LOOP AT gt_item_tmp
+    ASSIGNING FIELD-SYMBOL(<fs_item_tmp>)
+    WHERE kostl EQ gs_coep-kostl.
+    COLLECT <fs_item_tmp> INTO gt_coep_item.
+  ENDLOOP.
+
+  IF gt_coep_item IS NOT INITIAL.
+    SORT gt_coep_item BY wkgbtr DESCENDING.
+    LOOP AT gt_coep_item ASSIGNING FIELD-SYMBOL(<fs_item>).
+      IF sy-tabix <= 10.
+        gs_col_item-coltxt = <fs_item>-txt20.
+        APPEND gs_col_item TO gt_col_item.
+      ENDIF.
+      CASE sy-tabix.
+
+        WHEN 1.
+            gs_val_item-val1 = <fs_item>-wkgbtr.
+        WHEN 2.
+            gs_val_item-val2 = <fs_item>-wkgbtr.
+        WHEN 3.
+            gs_val_item-val3 = <fs_item>-wkgbtr.
+        WHEN 4.
+            gs_val_item-val4 = <fs_item>-wkgbtr.
+        WHEN 5.
+            gs_val_item-val5 = <fs_item>-wkgbtr.
+        WHEN 6.
+            gs_val_item-val6 = <fs_item>-wkgbtr.
+        WHEN 7.
+            gs_val_item-val7 = <fs_item>-wkgbtr.
+        WHEN 8.
+            gs_val_item-val8 = <fs_item>-wkgbtr.
+        WHEN 9.
+            gs_val_item-val9 = <fs_item>-wkgbtr.
+        WHEN 10.
+            gs_val_item-val10 = <fs_item>-wkgbtr.
+      ENDCASE.
+    ENDLOOP.
+  ENDIF.
+  APPEND gs_val_item TO gt_val_item.
+
+  UNASSIGN: <fs_item_tmp>, <fs_item>.
+ENDFORM.

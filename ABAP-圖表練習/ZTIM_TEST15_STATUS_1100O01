@@ -1,0 +1,46 @@
+*----------------------------------------------------------------------*
+***INCLUDE ZTIM_TEST15_STATUS_1100O01.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Module STATUS_1100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE status_1100 OUTPUT.
+  SET PF-STATUS 'STATUS'.
+* SET TITLEBAR 'xxx'.
+
+  CREATE OBJECT go_header
+    EXPORTING
+      container_name   =   'HEADER_CONT1'.
+
+  CREATE OBJECT go_header_alv
+    EXPORTING
+      i_parent   =   go_header.
+
+  IF gt_fieldcat_header IS INITIAL.
+    d_build_fieldcat:
+      gt_fieldcat_header 'GJAHR' '' '' '' '會計年度',
+      gt_fieldcat_header 'PERIO' '' '' '' '期間',
+      gt_fieldcat_header 'KOSTL' '' '' '' '成本中心',
+      gt_fieldcat_header 'WKGBTR' '' '' '' '金額'.
+  ENDIF.
+
+  CREATE OBJECT go_event_receiver.
+  SET HANDLER go_event_receiver->handle_double_click FOR go_header_alv.
+
+  CALL METHOD go_header_alv->set_table_for_first_display
+    CHANGING
+      it_outtab   =   gt_coep[]
+      it_fieldcatalog   =   gt_fieldcat_header.
+
+  CALL FUNCTION 'GFW_PRES_SHOW'
+    EXPORTING
+      container               = 'HEADER_CONT2'
+      presentation_type       = 29
+      header                  = '各事業處成本比例'
+    TABLES
+      values                  = gt_val
+      column_texts            = gt_col.
+
+ENDMODULE.
