@@ -1,0 +1,955 @@
+*&---------------------------------------------------------------------*
+*& Report ZTIM_TEST29
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ztim_test29.
+
+TABLES: faglflext.
+TYPE-POOLS:slis.
+
+CLASS lcl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    METHODS:  handle_double_click FOR EVENT double_click
+      OF cl_gui_alv_grid
+      IMPORTING e_row e_column.
+ENDCLASS.
+CLASS lcl_event_receiver IMPLEMENTATION.
+  METHOD handle_double_click.
+    CONDENSE e_row NO-GAPS.
+    CONDENSE e_column NO-GAPS.
+    PERFORM switch_prctr.
+  ENDMETHOD.
+ENDCLASS.
+
+DATA: BEGIN OF gt_prctr OCCURS 0,
+    prctr TYPE faglflext-prctr,
+    ktext TYPE cepct-ktext,
+  END OF gt_prctr.
+
+DATA: BEGIN OF gt_faglflext OCCURS 0,
+    serno(3) TYPE c,
+    descr TYPE ztim_test29t1-descr,
+    prctr TYPE faglflext-prctr,
+    hslvt TYPE faglflext-hslvt,
+    ksl01 TYPE faglflext-ksl01,
+    ksl02 TYPE faglflext-ksl02,
+    ksl03 TYPE faglflext-ksl03,
+    ksl04 TYPE faglflext-ksl04,
+    ksl05 TYPE faglflext-ksl05,
+    ksl06 TYPE faglflext-ksl06,
+    ksl07 TYPE faglflext-ksl07,
+    ksl08 TYPE faglflext-ksl08,
+    ksl09 TYPE faglflext-ksl09,
+    ksl10 TYPE faglflext-ksl10,
+    ksl11 TYPE faglflext-ksl11,
+    ksl12 TYPE faglflext-ksl12,
+    rtcur TYPE faglflext-rtcur,
+    if_form TYPE c,
+    degree(3) TYPE c,
+  END OF gt_faglflext,
+  BEGIN OF gt_faglflext_display occurs 0,
+    serno(3) TYPE c,
+    descr TYPE ztim_test29t1-descr,
+    prctr TYPE faglflext-prctr,
+    hslvt TYPE faglflext-hslvt,
+    ksl01 TYPE faglflext-ksl01,
+    ksl02 TYPE faglflext-ksl02,
+    ksl03 TYPE faglflext-ksl03,
+    ksl04 TYPE faglflext-ksl04,
+    ksl05 TYPE faglflext-ksl05,
+    ksl06 TYPE faglflext-ksl06,
+    ksl07 TYPE faglflext-ksl07,
+    ksl08 TYPE faglflext-ksl08,
+    ksl09 TYPE faglflext-ksl09,
+    ksl10 TYPE faglflext-ksl10,
+    ksl11 TYPE faglflext-ksl11,
+    ksl12 TYPE faglflext-ksl12,
+  END OF gt_faglflext_display,
+  gs_faglflext LIKE LINE OF gt_faglflext.
+DATA:
+      ok_code TYPE sy-ucomm,
+      gt_fieldcat_prctr TYPE lvc_t_fcat,
+      gt_fieldcat_report TYPE lvc_t_fcat,
+      gs_fieldcat  TYPE lvc_s_fcat,
+      go_prctr TYPE REF TO cl_gui_custom_container,
+      go_report TYPE REF TO cl_gui_custom_container,
+      go_prctr_alv TYPE REF TO cl_gui_alv_grid,
+      go_report_alv TYPE REF TO cl_gui_alv_grid,
+      go_event_receiver TYPE REF TO lcl_event_receiver.
+
+  " Tree Data
+  DATA: go_container TYPE REF TO cl_gui_splitter_container,    " 畫面容器物件
+      gr_prctr_tree TYPE REF TO cl_salv_tree, " ALV Tree 物件
+      gr_tree      TYPE REF TO cl_salv_tree,  " ALV Tree 物件
+      gr_prctr_top_list  TYPE REF TO cl_salv_form_element,   " ALV Tree Top List
+      gr_top_list  TYPE REF TO cl_salv_form_element,   " ALV Tree Top List
+      gr_label     TYPE REF TO cl_salv_form_label,   " ALV Label
+      gr_text      TYPE REF TO cl_salv_form_text,   " ALV Text
+      gr_prctr_columns   TYPE REF TO cl_salv_columns_tree, " Tree 欄位設定物件
+      gr_columns   TYPE REF TO cl_salv_columns_tree, " Tree 欄位設定物件
+      "lr_columns TYPE REF TO cl_salv_columns,
+      gr_prctr_node      TYPE REF TO cl_salv_node, "  節點物件
+      gr_node      TYPE REF TO cl_salv_node, "  節點物件
+      BEGIN OF gt_prctr_tree_list OCCURS 0,     " 建立 Tree 使用 Table
+        ktext TYPE cepct-ktext,
+      END OF gt_prctr_tree_list,
+      gs_prctr_tree LIKE LINE OF gt_prctr_tree_list,  " 建立 Tree 節點使用 Structure
+      BEGIN OF gt_tree_list OCCURS 0,    " 建立 Tree 使用 Table
+        ksl01 TYPE ztim_test29d1,
+        ksl02 TYPE ztim_test29d2,
+        ksl03 TYPE ztim_test29d3,
+        ksl04 TYPE ztim_test29d4,
+        ksl05 TYPE ztim_test29d5,
+        ksl06 TYPE ztim_test29d6,
+        ksl07 TYPE ztim_test29d7,
+        ksl08 TYPE ztim_test29d8,
+        ksl09 TYPE ztim_test29d9,
+        ksl10 TYPE ztim_test29d10,
+        ksl11 TYPE ztim_test29d11,
+        ksl12 TYPE ztim_test29d12,
+      END OF gt_tree_list,
+      gs_tree LIKE LINE OF gt_tree_list,  " 建立 Tree 節點使用 Structure
+      BEGIN OF gt_excel_list OCCURS 0,
+        text TYPE lvc_value,
+        ksl01 TYPE faglflext-ksl01,
+        ksl02 TYPE faglflext-ksl02,
+        ksl03 TYPE faglflext-ksl03,
+        ksl04 TYPE faglflext-ksl04,
+        ksl05 TYPE faglflext-ksl05,
+        ksl06 TYPE faglflext-ksl06,
+        ksl07 TYPE faglflext-ksl07,
+        ksl08 TYPE faglflext-ksl08,
+        ksl09 TYPE faglflext-ksl09,
+        ksl10 TYPE faglflext-ksl10,
+        ksl11 TYPE faglflext-ksl11,
+        ksl12 TYPE faglflext-ksl12,
+      END OF gt_excel_list,
+      gs_excel_list LIKE LINE OF gt_excel_list,
+      "  轉換 Tree ALV 至  一般 ALV，需使用到節點 Table、Structure
+      lt_nodes     TYPE salv_t_nodes,
+      ls_node      LIKE LINE OF lt_nodes.
+
+DEFINE d_build_fieldcat.
+  gs_fieldcat-fieldname  = &2.
+  gs_fieldcat-checkbox   = &3.
+  gs_fieldcat-edit       = &4.
+  gs_fieldcat-no_out     = &5.
+  gs_fieldcat-coltext    = &6.
+  APPEND gs_fieldcat TO &1.
+  CLEAR gs_fieldcat.
+END-OF-DEFINITION.
+
+DEFINE calculate_form.
+  READ TABLE gt_faglflext WITH KEY serno = &3 prctr = &4
+  INTO gs_faglflext.
+  CASE &2.
+    WHEN '+'.
+      &1-ksl01 = &1-ksl01 + gs_faglflext-ksl01.
+      &1-ksl02 = &1-ksl02 + gs_faglflext-ksl02.
+      &1-ksl03 = &1-ksl03 + gs_faglflext-ksl03.
+      &1-ksl04 = &1-ksl04 + gs_faglflext-ksl04.
+      &1-ksl05 = &1-ksl05 + gs_faglflext-ksl05.
+      &1-ksl06 = &1-ksl06 + gs_faglflext-ksl06.
+      &1-ksl07 = &1-ksl07 + gs_faglflext-ksl07.
+      &1-ksl08 = &1-ksl08 + gs_faglflext-ksl08.
+      &1-ksl09 = &1-ksl09 + gs_faglflext-ksl09.
+      &1-ksl10 = &1-ksl10 + gs_faglflext-ksl10.
+      &1-ksl11 = &1-ksl11 + gs_faglflext-ksl11.
+      &1-ksl12 = &1-ksl12 + gs_faglflext-ksl12.
+    WHEN '-'.
+      &1-ksl01 = &1-ksl01 - gs_faglflext-ksl01.
+      &1-ksl02 = &1-ksl02 - gs_faglflext-ksl02.
+      &1-ksl03 = &1-ksl03 - gs_faglflext-ksl03.
+      &1-ksl04 = &1-ksl04 - gs_faglflext-ksl04.
+      &1-ksl05 = &1-ksl05 - gs_faglflext-ksl05.
+      &1-ksl06 = &1-ksl06 - gs_faglflext-ksl06.
+      &1-ksl07 = &1-ksl07 - gs_faglflext-ksl07.
+      &1-ksl08 = &1-ksl08 - gs_faglflext-ksl08.
+      &1-ksl09 = &1-ksl09 - gs_faglflext-ksl09.
+      &1-ksl10 = &1-ksl10 - gs_faglflext-ksl10.
+      &1-ksl11 = &1-ksl11 - gs_faglflext-ksl11.
+      &1-ksl12 = &1-ksl12 - gs_faglflext-ksl12.
+   ENDCASE.
+   CLEAR: gs_faglflext.
+END-OF-DEFINITION.
+
+RANGES: gr_racct FOR faglflext-racct.
+
+SELECTION-SCREEN BEGIN OF BLOCK blk1 WITH FRAME TITLE TEXT-001.
+  PARAMETERS: p_ryear TYPE faglflext-ryear OBLIGATORY,
+    p_bukrs TYPE faglflext-rbukrs OBLIGATORY,
+    p_rpmax TYPE faglflext-rpmax.
+SELECTION-SCREEN END OF BLOCK blk1.
+
+SELECTION-SCREEN BEGIN OF BLOCK blk2 WITH FRAME TITLE TEXT-002.
+  SELECT-OPTIONS: s_prctr FOR faglflext-prctr.
+SELECTION-SCREEN END OF BLOCK blk2.
+
+START-OF-SELECTION.
+
+SELECT
+  prctr AS prctr,
+  ktext AS ktext
+FROM cepct
+INTO TABLE @gt_prctr
+WHERE kokrs EQ 'ITT0'
+  AND spras EQ 'M'
+  AND prctr IN @s_prctr.
+
+RANGES: lr_prctr FOR cepct-prctr.
+lr_prctr-sign ='E'.
+lr_prctr-option = 'CP'.
+lr_prctr-low = '2*'.
+APPEND lr_prctr.
+
+DELETE gt_prctr WHERE prctr IN lr_prctr.
+APPEND INITIAL LINE TO gt_prctr ASSIGNING FIELD-SYMBOL(<fs_prctr>).
+<fs_prctr>-prctr = ''.
+<fs_prctr>-ktext = '總和'.
+SORT gt_prctr.
+PERFORM get_data.
+PERFORM process_data.
+
+CALL SCREEN '1100'.
+
+*&---------------------------------------------------------------------*
+*& Module STATUS_1100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE status_1100 OUTPUT.
+  SET PF-STATUS 'STATUS'.
+  SET TITLEBAR 'T001'.
+
+  DATA: lv_prctr_key TYPE lvc_nkey,
+        lv_node_title TYPE lvc_value.
+  " 利潤中心選擇頁籤
+  CREATE OBJECT go_prctr
+    EXPORTING
+      container_name   =   'CON_PRCTR'.
+
+  CREATE OBJECT go_prctr_alv
+    EXPORTING
+      i_parent   =   go_prctr.
+
+  IF gt_fieldcat_prctr IS INITIAL.
+    d_build_fieldcat:
+      gt_fieldcat_prctr 'PRCTR' '' '' '' '利潤中心',
+      gt_fieldcat_prctr 'KTEXT' '' '' '' '名稱'.
+  ENDIF.
+
+  CREATE OBJECT go_event_receiver.
+  SET HANDLER go_event_receiver->handle_double_click FOR go_prctr_alv.
+
+  CALL METHOD go_prctr_alv->set_table_for_first_display
+    CHANGING
+      it_outtab   =  gt_prctr[]
+      it_fieldcatalog   =   gt_fieldcat_prctr.
+
+
+  " 建立 營業成本表
+  " 判斷 ALV 是否建立，由於是使用 Call Screen 方式
+  " 建立，如果重複於同樣畫面容器建立，會出現 Dump
+  CREATE OBJECT go_report
+    EXPORTING
+      container_name   =   'CON_DISPLAY'.
+
+  IF gr_tree IS NOT BOUND.
+    " 透過Call Function方式，建立 ALV Tree
+    cl_salv_tree=>factory(
+      EXPORTING
+        r_container   =   go_report " 設定物件需放於 Screen 的哪個位置
+      IMPORTING
+        r_salv_tree  = gr_tree " 將生成物件放入自己建立的 Tree 物件
+      CHANGING
+        t_table     = gt_tree_list[] " 放入 Tree 的 Table，後續建立節點皆需與此結構相同
+    ).
+      "DATA: gr_top_list TYPE REF TO cl_salv_form_element,
+    DATA lr_grid TYPE REF TO cl_salv_form_layout_grid.
+
+    CREATE OBJECT lr_grid.
+
+    "  表頭 資訊
+    "PERFORM tree_header CHANGING lr_grid.
+
+    gr_top_list = lr_grid.
+    gr_tree->set_top_of_list( gr_top_list ).
+
+    " 設定 ALV Tree 欄位
+    gr_columns = gr_tree->get_columns( ).
+    "最佳化爛位寬度設定
+    gr_columns->set_optimize( abap_true ).
+
+    DATA: lv_header_key TYPE lvc_nkey.
+
+    DATA: lv_degree TYPE i,
+          lv_degree_c(3) TYPE c.
+    lv_degree = 1.
+    CLEAR: lv_node_title, lv_header_key.
+    WHILE lv_degree < 99.
+      lv_degree_c = lv_degree.
+      LOOP AT gt_faglflext
+        WHERE degree EQ lv_degree_c
+          AND prctr EQ ''.
+        gs_tree-ksl01 = gt_faglflext-ksl01.
+        gs_tree-ksl02 = gt_faglflext-ksl02.
+        gs_tree-ksl03 = gt_faglflext-ksl03.
+        gs_tree-ksl04 = gt_faglflext-ksl04.
+        gs_tree-ksl05 = gt_faglflext-ksl05.
+        gs_tree-ksl06 = gt_faglflext-ksl06.
+        gs_tree-ksl07 = gt_faglflext-ksl07.
+        gs_tree-ksl08 = gt_faglflext-ksl08.
+        gs_tree-ksl09 = gt_faglflext-ksl09.
+        gs_tree-ksl10 = gt_faglflext-ksl10.
+        gs_tree-ksl11 = gt_faglflext-ksl11.
+        gs_tree-ksl12 = gt_faglflext-ksl12.
+
+        lv_node_title = gt_faglflext-descr.
+        IF lv_header_key IS INITIAL.
+          gr_node = gr_tree->get_nodes( )->add_node(
+            related_node = space      " 無上階，則帶空值
+            text     = lv_node_title
+            data_row = gs_tree  " 帶入 Tree 項目資料
+            relationship = cl_gui_column_tree=>relat_last_child ).
+        ELSEIF lv_header_key IS NOT INITIAL.
+          gr_node = gr_tree->get_nodes( )->add_node(
+            related_node = lv_header_key      " 帶入上階
+            text     = lv_node_title
+            data_row = gs_tree  " 帶入 Tree 項目資料
+            relationship = cl_gui_column_tree=>relat_last_child ).
+        ENDIF.
+        CLEAR: gs_tree.
+      ENDLOOP.
+      lv_header_key = gr_node->get_key( ).
+      lv_degree = lv_degree + 1.
+
+    ENDWHILE.
+
+    CLEAR: gs_tree.
+    "  產生 ALV 工具
+    gr_tree->set_screen_status(
+      EXPORTING
+        report        = sy-repid
+        pfstatus      = 'STATUS'
+        set_functions = gr_tree->c_functions_all
+    ).
+
+    gr_tree->display( ).
+  ENDIF.
+
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_1100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_1100 INPUT.
+  CASE ok_code.
+    WHEN 'F03'.
+      LEAVE TO SCREEN 0.
+    WHEN 'F05'.
+      SET SCREEN 0.
+    WHEN 'F12'.
+      LEAVE PROGRAM.
+  ENDCASE.
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&                       Form SWITCH_PRCTR
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+FORM switch_prctr.
+  DATA:t_selected_rows TYPE lvc_t_row,
+        ls_selected_row LIKE LINE OF t_selected_rows,
+        lv_index TYPE i.
+
+  CALL METHOD go_prctr_alv->get_selected_rows
+    IMPORTING
+      et_index_rows   =   t_selected_rows.
+
+  READ TABLE t_selected_rows INDEX 1 INTO ls_selected_row.
+
+  READ TABLE gt_prctr INDEX ls_selected_row-index.
+  IF sy-subrc EQ 0.
+    CLEAR: gt_faglflext_display.
+    FREE gt_faglflext_display.
+    LOOP AT gt_faglflext
+      WHERE prctr EQ gt_prctr-prctr.
+      APPEND gt_faglflext TO gt_faglflext_display.
+    ENDLOOP.
+    PERFORM refresh_tree USING gt_prctr-prctr.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                    Form REFRESH_TREE
+*&---------------------------------------------------------------------*
+*&                          重新產生Tree
+*&---------------------------------------------------------------------*
+FORM refresh_tree USING prctr LIKE gt_faglflext-prctr.
+  gr_tree->get_nodes( )->delete_all( ).
+  CLEAR: lv_header_key.
+  lv_degree = 1.
+  WHILE lv_degree < 99.
+    lv_degree_c = lv_degree.
+    LOOP AT gt_faglflext
+      WHERE degree EQ lv_degree_c
+        AND prctr EQ prctr.
+      gs_tree-ksl01 = gt_faglflext-ksl01.
+      gs_tree-ksl02 = gt_faglflext-ksl02.
+      gs_tree-ksl03 = gt_faglflext-ksl03.
+      gs_tree-ksl04 = gt_faglflext-ksl04.
+      gs_tree-ksl05 = gt_faglflext-ksl05.
+      gs_tree-ksl06 = gt_faglflext-ksl06.
+      gs_tree-ksl07 = gt_faglflext-ksl07.
+      gs_tree-ksl08 = gt_faglflext-ksl08.
+      gs_tree-ksl09 = gt_faglflext-ksl09.
+      gs_tree-ksl10 = gt_faglflext-ksl10.
+      gs_tree-ksl11 = gt_faglflext-ksl11.
+      gs_tree-ksl12 = gt_faglflext-ksl12.
+
+      lv_node_title = gt_faglflext-descr.
+      IF lv_header_key IS INITIAL.
+        gr_node = gr_tree->get_nodes( )->add_node(
+          related_node = space      " 無上階，則帶空值
+          text     = lv_node_title
+          data_row = gs_tree  " 帶入 Tree 項目資料
+          relationship = cl_gui_column_tree=>relat_last_child ).
+      ELSEIF lv_header_key IS NOT INITIAL.
+        gr_node = gr_tree->get_nodes( )->add_node(
+          related_node = lv_header_key      " 帶入上階
+          text     = lv_node_title
+          data_row = gs_tree  " 帶入 Tree 項目資料
+          relationship = cl_gui_column_tree=>relat_last_child ).
+      ENDIF.
+      CLEAR: gs_tree.
+    ENDLOOP.
+    lv_header_key = gr_node->get_key( ).
+    lv_degree = lv_degree + 1.
+  ENDWHILE.
+  gr_tree->display( ).
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&                         Form GET_DATA
+*&---------------------------------------------------------------------*
+*&                     抓取FAGLFLEXT 資料
+*&---------------------------------------------------------------------*
+FORM get_data.
+  SELECT
+    *
+  FROM ztim_test29t1
+  INTO @DATA(ls_ztim_test29t1).
+    IF ls_ztim_test29t1-is_form NE 'X'.
+      gr_racct-sign = 'I'.
+      IF ls_ztim_test29t1-racct_h IS INITIAL.
+        gr_racct-option = 'EQ'.
+      ELSEIF ls_ztim_test29t1-racct_h IS NOT INITIAL.
+        gr_racct-option = 'BT'.
+      ENDIF.
+      gr_racct-low = ls_ztim_test29t1-racct_l.
+      gr_racct-high = ls_ztim_test29t1-racct_h.
+      APPEND gr_racct.
+    ENDIF.
+    IF gr_racct IS NOT INITIAL.
+      SELECT
+        *
+      FROM faglflext AS fl
+      INTO @DATA(ls_faglflext)
+      WHERE fl~ryear EQ @p_ryear
+        AND fl~rldnr EQ '0L'
+        AND fl~rrcty EQ '0'
+        AND fl~rbukrs EQ @p_bukrs
+        AND fl~prctr IN @s_prctr
+        AND fl~racct IN @gr_racct.
+          gt_faglflext-serno = ls_ztim_test29t1-serno.
+          gt_faglflext-descr = ls_ztim_test29t1-descr.
+          gt_faglflext-prctr = ls_faglflext-prctr.
+          gt_faglflext-hslvt = ls_faglflext-hslvt.
+          gt_faglflext-ksl01 = ls_faglflext-hsl01.
+          gt_faglflext-ksl02 = ls_faglflext-hsl02.
+          gt_faglflext-ksl03 = ls_faglflext-hsl03.
+          gt_faglflext-ksl04 = ls_faglflext-hsl04.
+          gt_faglflext-ksl05 = ls_faglflext-hsl05.
+          gt_faglflext-ksl06 = ls_faglflext-hsl06.
+          gt_faglflext-ksl07 = ls_faglflext-hsl07.
+          gt_faglflext-ksl08 = ls_faglflext-hsl08.
+          gt_faglflext-ksl09 = ls_faglflext-hsl09.
+          gt_faglflext-ksl10 = ls_faglflext-hsl10.
+          gt_faglflext-ksl11 = ls_faglflext-hsl11.
+          gt_faglflext-ksl12 = ls_faglflext-hsl12.
+          gt_faglflext-degree = ls_ztim_test29t1-degree.
+          COLLECT gt_faglflext.
+      ENDSELECT.
+    ELSEIF ls_ztim_test29t1-is_form EQ 'X'.
+      gt_faglflext-serno = ls_ztim_test29t1-serno.
+      gt_faglflext-descr = ls_ztim_test29t1-descr.
+      gt_faglflext-degree = ls_ztim_test29t1-degree.
+      gt_faglflext-if_form = 'X'.
+      COLLECT gt_faglflext.
+    ENDIF.
+    CLEAR: gr_racct, gt_faglflext, ls_faglflext.
+    FREE: gr_racct.
+  ENDSELECT.
+
+  SORT gt_faglflext BY serno.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&                    Form PROCESS_DATA
+*&---------------------------------------------------------------------*
+*&                              資料處理
+*&---------------------------------------------------------------------*
+FORM process_data.
+  DATA: lt_faglflext LIKE STANDARD TABLE OF gt_faglflext WITH HEADER LINE,
+        ls_faglflext LIKE LINE OF gt_faglflext.
+
+  " 計算項目總和值
+  LOOP AT gt_faglflext WHERE if_form NE 'X'.
+    lt_faglflext = gt_faglflext.
+    lt_faglflext-prctr = ''.
+    COLLECT lt_faglflext.
+  ENDLOOP.
+  CLEAR: lt_faglflext.
+  LOOP AT lt_faglflext.
+    APPEND lt_faglflext TO gt_faglflext.
+  ENDLOOP.
+  SORT gt_faglflext BY serno prctr.
+
+  LOOP AT gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>).
+    IF p_bukrs EQ '1000'.
+      <fs_faglflext>-rtcur = 'TWD'.
+    ELSE.
+      <fs_faglflext>-rtcur = 'USD'.
+    ENDIF.
+    " 幣別轉換
+    <fs_faglflext>-hslvt = |{ <fs_faglflext>-hslvt CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl01 = |{ <fs_faglflext>-ksl01 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl02 = |{ <fs_faglflext>-ksl02 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl03 = |{ <fs_faglflext>-ksl03 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl04 = |{ <fs_faglflext>-ksl04 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl05 = |{ <fs_faglflext>-ksl05 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl06 = |{ <fs_faglflext>-ksl06 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl07 = |{ <fs_faglflext>-ksl07 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl08 = |{ <fs_faglflext>-ksl08 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl09 = |{ <fs_faglflext>-ksl09 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl10 = |{ <fs_faglflext>-ksl10 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl11 = |{ <fs_faglflext>-ksl11 CURRENCY = <fs_faglflext>-rtcur }|.
+    <fs_faglflext>-ksl12 = |{ <fs_faglflext>-ksl12 CURRENCY = <fs_faglflext>-rtcur }|.
+
+    IF '期初' CO <fs_faglflext>-descr.
+      MOVE-CORRESPONDING <fs_faglflext> TO ls_faglflext.
+      <fs_faglflext>-ksl01  = ls_faglflext-hslvt.
+      <fs_faglflext>-ksl02  = <fs_faglflext>-ksl01 + ls_faglflext-ksl01.
+      <fs_faglflext>-ksl03  = <fs_faglflext>-ksl02 + ls_faglflext-ksl02.
+      <fs_faglflext>-ksl04  = <fs_faglflext>-ksl03 + ls_faglflext-ksl03.
+      <fs_faglflext>-ksl05  = <fs_faglflext>-ksl04 + ls_faglflext-ksl04.
+      <fs_faglflext>-ksl06  = <fs_faglflext>-ksl05 + ls_faglflext-ksl05.
+      <fs_faglflext>-ksl07  = <fs_faglflext>-ksl06 + ls_faglflext-ksl06.
+      <fs_faglflext>-ksl08  = <fs_faglflext>-ksl07 + ls_faglflext-ksl07.
+      <fs_faglflext>-ksl09  = <fs_faglflext>-ksl08 + ls_faglflext-ksl08.
+      <fs_faglflext>-ksl10  = <fs_faglflext>-ksl09 + ls_faglflext-ksl09.
+      <fs_faglflext>-ksl11  = <fs_faglflext>-ksl10 + ls_faglflext-ksl10.
+      <fs_faglflext>-ksl12  = <fs_faglflext>-ksl11 + ls_faglflext-ksl11.
+    ELSEIF '期末' CO <fs_faglflext>-descr .
+      MOVE-CORRESPONDING <fs_faglflext> TO ls_faglflext.
+      <fs_faglflext>-ksl01  = ls_faglflext-hslvt + ls_faglflext-ksl01.
+      <fs_faglflext>-ksl02  = <fs_faglflext>-ksl01 + ls_faglflext-ksl02.
+      <fs_faglflext>-ksl03  = <fs_faglflext>-ksl02 + ls_faglflext-ksl03.
+      <fs_faglflext>-ksl04  = <fs_faglflext>-ksl03 + ls_faglflext-ksl04.
+      <fs_faglflext>-ksl05  = <fs_faglflext>-ksl04 + ls_faglflext-ksl05.
+      <fs_faglflext>-ksl06  = <fs_faglflext>-ksl05 + ls_faglflext-ksl06.
+      <fs_faglflext>-ksl07  = <fs_faglflext>-ksl06 + ls_faglflext-ksl07.
+      <fs_faglflext>-ksl08  = <fs_faglflext>-ksl07 + ls_faglflext-ksl08.
+      <fs_faglflext>-ksl09  = <fs_faglflext>-ksl08 + ls_faglflext-ksl09.
+      <fs_faglflext>-ksl10  = <fs_faglflext>-ksl09 + ls_faglflext-ksl10.
+      <fs_faglflext>-ksl11  = <fs_faglflext>-ksl10 + ls_faglflext-ksl11.
+      <fs_faglflext>-ksl12  = <fs_faglflext>-ksl11 + ls_faglflext-ksl12.
+    ENDIF.
+    IF <fs_faglflext>-serno EQ 21.  "  減：轉列拆解費用
+      <fs_faglflext>-ksl01  = <fs_faglflext>-ksl01 * -1.
+      <fs_faglflext>-ksl02  = <fs_faglflext>-ksl02 * -1.
+      <fs_faglflext>-ksl03  = <fs_faglflext>-ksl03 * -1.
+      <fs_faglflext>-ksl04  = <fs_faglflext>-ksl04 * -1.
+      <fs_faglflext>-ksl05  = <fs_faglflext>-ksl05 * -1.
+      <fs_faglflext>-ksl06  = <fs_faglflext>-ksl06 * -1.
+      <fs_faglflext>-ksl07 =  <fs_faglflext>-ksl07 * -1.
+      <fs_faglflext>-ksl08  = <fs_faglflext>-ksl08 * -1.
+      <fs_faglflext>-ksl09  = <fs_faglflext>-ksl09 * -1.
+      <fs_faglflext>-ksl10  = <fs_faglflext>-ksl10 * -1.
+      <fs_faglflext>-ksl11  = <fs_faglflext>-ksl11 * -1.
+      <fs_faglflext>-ksl12  = <fs_faglflext>-ksl12 * -1.
+    ELSEIF <fs_faglflext>-serno EQ 22. "  減：轉列研發費用
+      <fs_faglflext>-ksl01  = <fs_faglflext>-ksl01 * -1.
+      <fs_faglflext>-ksl02  = <fs_faglflext>-ksl02 * -1.
+      <fs_faglflext>-ksl03  = <fs_faglflext>-ksl03 * -1.
+      <fs_faglflext>-ksl04  = <fs_faglflext>-ksl04 * -1.
+      <fs_faglflext>-ksl05  = <fs_faglflext>-ksl05 * -1.
+      <fs_faglflext>-ksl06  = <fs_faglflext>-ksl06 * -1.
+      <fs_faglflext>-ksl07 =  <fs_faglflext>-ksl07 * -1.
+      <fs_faglflext>-ksl08  = <fs_faglflext>-ksl08 * -1.
+      <fs_faglflext>-ksl09  = <fs_faglflext>-ksl09 * -1.
+      <fs_faglflext>-ksl10  = <fs_faglflext>-ksl10 * -1.
+      <fs_faglflext>-ksl11  = <fs_faglflext>-ksl11 * -1.
+      <fs_faglflext>-ksl12  = <fs_faglflext>-ksl12 * -1.
+    ENDIF.
+    IF <fs_faglflext>-if_form = 'X'.
+      LOOP AT gt_prctr.
+        READ TABLE gt_faglflext WITH KEY descr = <fs_faglflext>-descr prctr = gt_prctr-prctr.
+        IF sy-subrc NE 0.
+          APPEND INITIAL LINE TO gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflfext_new>).
+          <fs_faglflfext_new> = <fs_faglflext>.
+          <fs_faglflfext_new>-prctr = gt_prctr-prctr.
+        ENDIF.
+      ENDLOOP.
+      CASE <fs_faglflext>-descr.
+        WHEN '本期投入生產原料'.
+          PERFORM calculate_production_raw USING <fs_faglflext>-prctr.
+        WHEN '本期投入生產成本'.
+          PERFORM calculate_production_cost USING <fs_faglflext>-prctr.
+        WHEN '加：事業處轉撥成本'.
+          PERFORM calculate_transfer_of_businese USING <fs_faglflext>-prctr.
+        WHEN '本期製成品成本'.
+          PERFORM calculate_fert_cost USING <fs_faglflext>-prctr.
+        WHEN '銷貨成本-製成品'.
+          PERFORM calculate_fert_sale_cost USING <fs_faglflext>-prctr.
+        WHEN '本期營業成本'.
+          PERFORM calculate_operating_cost USING <fs_faglflext>-prctr.
+      ENDCASE.
+    ENDIF.
+  ENDLOOP.
+  SORT gt_faglflext BY serno DESCENDING prctr ASCENDING.
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&       Form CALCULATE_PRODUCTION_RAW
+*&---------------------------------------------------------------------*
+*&                   計算 本期投入生產原料
+*&---------------------------------------------------------------------*
+FORM calculate_production_raw USING prctr LIKE gt_faglflext-prctr.
+  DATA: ls_faglflext LIKE LINE OF gt_faglflext.
+  READ TABLE gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WITH KEY descr = '本期投入生產原料' prctr = prctr.
+  IF sy-subrc EQ 0.
+    READ TABLE gt_faglflext
+      WITH KEY descr = '期初原料' prctr = prctr INTO ls_faglflext.
+    <fs_faglflext>-ksl01 = ls_faglflext-ksl01.
+    <fs_faglflext>-ksl02 = ls_faglflext-ksl02.
+    <fs_faglflext>-ksl03 = ls_faglflext-ksl03.
+    <fs_faglflext>-ksl04 = ls_faglflext-ksl04.
+    <fs_faglflext>-ksl05 = ls_faglflext-ksl05.
+    <fs_faglflext>-ksl06 = ls_faglflext-ksl06.
+    <fs_faglflext>-ksl07 = ls_faglflext-ksl07.
+    <fs_faglflext>-ksl08 = ls_faglflext-ksl08.
+    <fs_faglflext>-ksl09 = ls_faglflext-ksl09.
+    <fs_faglflext>-ksl10 = ls_faglflext-ksl10.
+    <fs_faglflext>-ksl11 = ls_faglflext-ksl11.
+    <fs_faglflext>-ksl12 = ls_faglflext-ksl12.
+
+    calculate_form:
+      <fs_faglflext> '+' 2 prctr,
+      <fs_faglflext> '+' 3 prctr,
+      <fs_faglflext> '-' 4 prctr,
+      <fs_faglflext> '-' 5 prctr,
+      <fs_faglflext> '-' 6 prctr,
+      <fs_faglflext> '-' 7 prctr,
+      <fs_faglflext> '-' 8 prctr,
+      <fs_faglflext> '-' 9 prctr,
+      <fs_faglflext> '-' 10 prctr,
+      <fs_faglflext> '-' 11 prctr,
+      <fs_faglflext> '-' 12 prctr,
+      <fs_faglflext> '-' 13 prctr,
+      <fs_faglflext> '-' 14 prctr,
+      <fs_faglflext> '-' 15 prctr.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&       Form CALCULATE_PRODUCTION_COST
+*&---------------------------------------------------------------------*
+*&                   計算 本期投入生產成本
+*&---------------------------------------------------------------------*
+FORM calculate_production_cost USING prctr LIKE gt_faglflext-prctr..
+  DATA: ls_faglflext LIKE LINE OF gt_faglflext.
+  READ TABLE gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WITH KEY descr = '本期投入生產成本' prctr = prctr.
+  IF sy-subrc EQ 0.
+    READ TABLE gt_faglflext
+      WITH KEY descr = '本期投入生產原料' prctr = prctr INTO ls_faglflext.
+    <fs_faglflext>-ksl01 = ls_faglflext-ksl01.
+    <fs_faglflext>-ksl02 = ls_faglflext-ksl02.
+    <fs_faglflext>-ksl03 = ls_faglflext-ksl03.
+    <fs_faglflext>-ksl04 = ls_faglflext-ksl04.
+    <fs_faglflext>-ksl05 = ls_faglflext-ksl05.
+    <fs_faglflext>-ksl06 = ls_faglflext-ksl06.
+    <fs_faglflext>-ksl07 = ls_faglflext-ksl07.
+    <fs_faglflext>-ksl08 = ls_faglflext-ksl08.
+    <fs_faglflext>-ksl09 = ls_faglflext-ksl09.
+    <fs_faglflext>-ksl10 = ls_faglflext-ksl10.
+    <fs_faglflext>-ksl11 = ls_faglflext-ksl11.
+    <fs_faglflext>-ksl12 = ls_faglflext-ksl12.
+
+    calculate_form:
+      <fs_faglflext> '+' 17 prctr, " 直接人工
+      <fs_faglflext> '+' 18 prctr, " 製造費用
+      <fs_faglflext> '+' 19 prctr, " 委外加工費
+      <fs_faglflext> '+' 20 prctr, "加：期初存貨轉入
+      <fs_faglflext> '-' 21 prctr,  "減：轉列拆解費用
+      <fs_faglflext> '-' 22 prctr,  "減：列轉研發費用
+      <fs_faglflext> '-' 23 prctr.  "減：生產投入產出差異
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&  Form CALCULATE_TRANSFER_OF_BUSINESE
+*&---------------------------------------------------------------------*
+*&                   計算 加：事業處轉撥成本
+*&---------------------------------------------------------------------*
+FORM calculate_transfer_of_businese USING prctr LIKE gt_faglflext-prctr..
+  DATA: BEGIN OF fcml_mat_rep_v3 OCCURS 0,
+      bdatj TYPE zfcml_mat_rep_v3-bdatj,
+      poper TYPE zfcml_mat_rep_v3-poper,
+      bukrs TYPE zfcml_mat_rep_v3-bukrs,
+      werks TYPE zfcml_mat_rep_v3-werks,
+      to_currency TYPE zfcml_mat_rep_v3-to_currency,
+      totalvalue TYPE zfcml_mat_rep_v3-totalvalue,
+    END OF fcml_mat_rep_v3.
+  DATA: ls_zfcml_mat_rep_v3   LIKE LINE OF fcml_mat_rep_v3.
+
+  RANGES: lr_werks FOR zfcml_mat_rep_v3-werks.
+
+  SELECT
+    bdatj AS bdatj,
+    poper AS poper,
+    bukrs AS bukrs,
+    werks AS werks,
+    to_currency AS to_currency,
+    totalvalue AS totalvalue
+  FROM zfcml_mat_rep_v3
+  INTO CORRESPONDING FIELDS OF @ls_zfcml_mat_rep_v3
+  WHERE bdatj EQ @p_ryear
+    AND bukrs EQ @p_bukrs
+    AND curtp EQ '10'
+    AND categ EQ 'ZU'
+    AND ptyp EQ 'BU'
+    AND mtart EQ 'HALB'.
+    ls_zfcml_mat_rep_v3-totalvalue = |{ ls_zfcml_mat_rep_v3-totalvalue CURRENCY = ls_zfcml_mat_rep_v3-to_currency }|.
+    COLLECT ls_zfcml_mat_rep_v3 INTO fcml_mat_rep_v3.
+  ENDSELECT.
+
+  SORT fcml_mat_rep_v3 BY bdatj poper werks.
+
+  LOOP AT gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WHERE descr EQ '加：事業處轉撥成本'.
+    IF <fs_faglflext>-prctr EQ '20S00'
+      OR <fs_faglflext>-prctr EQ '20S10'
+      OR <fs_faglflext>-prctr EQ '20S20'
+      OR <fs_faglflext>-prctr EQ '20Q00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1001'.
+      APPEND lr_werks.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1004'.
+      APPEND lr_werks.
+    ELSEIF <fs_faglflext>-prctr EQ '20E00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1002'.
+      APPEND lr_werks.
+    ELSEIF <fs_faglflext>-prctr EQ '20T00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1003'.
+      APPEND lr_werks.
+    ELSEIF <fs_faglflext>-prctr EQ '20B00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1005'.
+      APPEND lr_werks.
+    ELSEIF <fs_faglflext>-prctr EQ '20R00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1006'.
+      APPEND lr_werks.
+    ELSEIF <fs_faglflext>-prctr EQ '20D00'.
+      lr_werks-sign = 'I'.
+      lr_werks-option = 'EQ'.
+      lr_werks-low = '1007'.
+      APPEND lr_werks.
+    ENDIF.
+
+    LOOP AT fcml_mat_rep_v3
+      WHERE werks IN lr_werks.
+      CASE fcml_mat_rep_v3-poper.
+        WHEN 1.
+          <fs_faglflext>-ksl01 = fcml_mat_rep_v3-totalvalue.
+        WHEN 2.
+          <fs_faglflext>-ksl02 = fcml_mat_rep_v3-totalvalue.
+        WHEN 3.
+          <fs_faglflext>-ksl03 = fcml_mat_rep_v3-totalvalue.
+        WHEN 4.
+          <fs_faglflext>-ksl04 = fcml_mat_rep_v3-totalvalue.
+        WHEN 5.
+          <fs_faglflext>-ksl05 = fcml_mat_rep_v3-totalvalue.
+        WHEN 6.
+          <fs_faglflext>-ksl06 = fcml_mat_rep_v3-totalvalue.
+        WHEN 7.
+          <fs_faglflext>-ksl07 = fcml_mat_rep_v3-totalvalue.
+        WHEN 8.
+          <fs_faglflext>-ksl08 = fcml_mat_rep_v3-totalvalue.
+        WHEN 9.
+          <fs_faglflext>-ksl09 = fcml_mat_rep_v3-totalvalue.
+        WHEN 10.
+          <fs_faglflext>-ksl10 = fcml_mat_rep_v3-totalvalue.
+        WHEN 11.
+          <fs_faglflext>-ksl11 = fcml_mat_rep_v3-totalvalue.
+        WHEN 12.
+          <fs_faglflext>-ksl12 = fcml_mat_rep_v3-totalvalue.
+      ENDCASE.
+    ENDLOOP.
+    CLEAR: lr_werks.
+    FREE: lr_werks.
+  ENDLOOP.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&              Form CALCULATE_FERT_COST
+*&---------------------------------------------------------------------*
+*&                   計算 本期製成品成本
+*&---------------------------------------------------------------------*
+FORM calculate_fert_cost USING prctr LIKE gt_faglflext-prctr..
+  DATA: ls_faglflext LIKE LINE OF gt_faglflext.
+  READ TABLE gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WITH KEY descr = '本期製成品成本' prctr = prctr.
+  IF sy-subrc EQ 0.
+    READ TABLE gt_faglflext
+      WITH KEY descr = '本期投入生產成本' prctr = prctr INTO ls_faglflext.
+    <fs_faglflext>-ksl01 = ls_faglflext-ksl01.
+    <fs_faglflext>-ksl02 = ls_faglflext-ksl02.
+    <fs_faglflext>-ksl03 = ls_faglflext-ksl03.
+    <fs_faglflext>-ksl04 = ls_faglflext-ksl04.
+    <fs_faglflext>-ksl05 = ls_faglflext-ksl05.
+    <fs_faglflext>-ksl06 = ls_faglflext-ksl06.
+    <fs_faglflext>-ksl07 = ls_faglflext-ksl07.
+    <fs_faglflext>-ksl08 = ls_faglflext-ksl08.
+    <fs_faglflext>-ksl09 = ls_faglflext-ksl09.
+    <fs_faglflext>-ksl10 = ls_faglflext-ksl10.
+    <fs_faglflext>-ksl11 = ls_faglflext-ksl11.
+    <fs_faglflext>-ksl12 = ls_faglflext-ksl12.
+
+    calculate_form:
+      <fs_faglflext> '+' 25 prctr, " 期初半成品
+      <fs_faglflext> '+' 26 prctr, " 期初在途半成品
+      <fs_faglflext> '+' 27 prctr, " 期初在製品
+      <fs_faglflext> '+' 28 prctr, " 加：本期購入半成品
+      <fs_faglflext> '+' 29 prctr, " 加：期初在製品轉入
+      <fs_faglflext> '-' 30 prctr, " 減：研發料號移轉
+      <fs_faglflext> '-' 31 prctr, " 減：雜項領用
+      <fs_faglflext> '-' 32 prctr, " 減：研發領用
+      <fs_faglflext> '-' 33 prctr, " 減：樣品領用
+      <fs_faglflext> '-' 34 prctr, " 減：報廢
+      <fs_faglflext> '-' 35 prctr, " 減：品檢不良
+      <fs_faglflext> '-' 36 prctr, " 減：賠償報廢
+      <fs_faglflext> '-' 37 prctr, " 減：盤(盈)虧
+      <fs_faglflext> '-' 38 prctr, " 減：轉列銷貨成本差異
+      <fs_faglflext> '-' 39 prctr, " 減：出售
+      <fs_faglflext> '-' 40 prctr, " 加：事業處轉撥成本
+      <fs_faglflext> '-' 41 prctr, " 減：期末半成品
+      <fs_faglflext> '-' 42 prctr, " 減：期末在途半成品
+      <fs_faglflext> '-' 43 prctr. " 減：期末在製品
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&        Form CALCULATE_FERT_SALE_COST
+*&---------------------------------------------------------------------*
+*&                    計算 銷貨成本-製成品
+*&---------------------------------------------------------------------*
+FORM calculate_fert_sale_cost USING prctr LIKE gt_faglflext-prctr..
+  DATA: ls_faglflext LIKE LINE OF gt_faglflext.
+  READ TABLE gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WITH KEY descr = '銷貨成本-製成品' prctr = prctr.
+  IF sy-subrc EQ 0.
+    READ TABLE gt_faglflext
+      WITH KEY descr = '本期製成品成本' prctr = prctr INTO ls_faglflext.
+    <fs_faglflext>-ksl01 = ls_faglflext-ksl01.
+    <fs_faglflext>-ksl02 = ls_faglflext-ksl02.
+    <fs_faglflext>-ksl03 = ls_faglflext-ksl03.
+    <fs_faglflext>-ksl04 = ls_faglflext-ksl04.
+    <fs_faglflext>-ksl05 = ls_faglflext-ksl05.
+    <fs_faglflext>-ksl06 = ls_faglflext-ksl06.
+    <fs_faglflext>-ksl07 = ls_faglflext-ksl07.
+    <fs_faglflext>-ksl08 = ls_faglflext-ksl08.
+    <fs_faglflext>-ksl09 = ls_faglflext-ksl09.
+    <fs_faglflext>-ksl10 = ls_faglflext-ksl10.
+    <fs_faglflext>-ksl11 = ls_faglflext-ksl11.
+    <fs_faglflext>-ksl12 = ls_faglflext-ksl12.
+
+    calculate_form:
+      <fs_faglflext> '+' 45 prctr, " 期初半成品
+      <fs_faglflext> '+' 46 prctr, " 期初在途製成品
+      <fs_faglflext> '+' 47 prctr, " 加：本期購入製成品
+      <fs_faglflext> '-' 48 prctr, " 減：研發料號移轉
+      <fs_faglflext> '-' 49 prctr, " 減：雜項領用
+      <fs_faglflext> '-' 50 prctr, " 減：研發領用
+      <fs_faglflext> '-' 51 prctr, " 減：樣品領用
+      <fs_faglflext> '-' 52 prctr, " 減：報廢
+      <fs_faglflext> '-' 53 prctr, " 減：品檢不良
+      <fs_faglflext> '-' 54 prctr, " 減：賠償報廢
+      <fs_faglflext> '-' 55 prctr, " 減：盤(盈)虧
+      <fs_faglflext> '-' 56 prctr, " 減：銷貨成本-ML彙總科目指派
+      <fs_faglflext> '-' 57 prctr, " 減：轉列銷貨成本差異
+      <fs_faglflext> '-' 58 prctr, " 減：期末製成品
+      <fs_faglflext> '-' 59 prctr. " 減：期末在途製成品
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&         Form CALCULATE_OPERATING_COST
+*&---------------------------------------------------------------------*
+*&                       計算 本期營業成本
+*&---------------------------------------------------------------------*
+FORM calculate_operating_cost USING prctr LIKE gt_faglflext-prctr..
+  DATA: ls_faglflext LIKE LINE OF gt_faglflext.
+  READ TABLE gt_faglflext ASSIGNING FIELD-SYMBOL(<fs_faglflext>)
+    WITH KEY descr = '本期營業成本' prctr = prctr.
+  IF sy-subrc EQ 0.
+    READ TABLE gt_faglflext
+      WITH KEY descr = '銷貨成本-製成品' prctr = prctr INTO ls_faglflext.
+    <fs_faglflext>-ksl01 = ls_faglflext-ksl01.
+    <fs_faglflext>-ksl02 = ls_faglflext-ksl02.
+    <fs_faglflext>-ksl03 = ls_faglflext-ksl03.
+    <fs_faglflext>-ksl04 = ls_faglflext-ksl04.
+    <fs_faglflext>-ksl05 = ls_faglflext-ksl05.
+    <fs_faglflext>-ksl06 = ls_faglflext-ksl06.
+    <fs_faglflext>-ksl07 = ls_faglflext-ksl07.
+    <fs_faglflext>-ksl08 = ls_faglflext-ksl08.
+    <fs_faglflext>-ksl09 = ls_faglflext-ksl09.
+    <fs_faglflext>-ksl10 = ls_faglflext-ksl10.
+    <fs_faglflext>-ksl11 = ls_faglflext-ksl11.
+    <fs_faglflext>-ksl12 = ls_faglflext-ksl12.
+
+    calculate_form:
+      <fs_faglflext> '+' 61 prctr, " 銷貨成本-三角貿易
+      <fs_faglflext> '+' 62 prctr, " 銷貨成本-原料
+      <fs_faglflext> '+' 63 prctr, " 銷貨成本-半成品
+      <fs_faglflext> '+' 64 prctr, " 銷貨成本-GL
+      <fs_faglflext> '+' 65 prctr, " 銷貨成本-雜項
+      <fs_faglflext> '+' 66 prctr, " 銷貨成本-報廢
+      <fs_faglflext> '+' 67 prctr, " 銷貨成本-品檢不良
+      <fs_faglflext> '+' 68 prctr, " 銷貨成本-賠償報廢
+      <fs_faglflext> '+' 69 prctr, " 銷貨成本-盤(盈)虧
+      <fs_faglflext> '+' 70 prctr, " 銷貨成本-存貨跌價與回升利益
+      <fs_faglflext> '+' 71 prctr, " 銷貨成本-下腳收入
+      <fs_faglflext> '+' 72 prctr, " 銷貨成本-其他收入
+      <fs_faglflext> '+' 73 prctr, " 銷貨成本-閒置產能損失
+      <fs_faglflext> '+' 74 prctr, " 銷貨成本-投入產出差異
+      <fs_faglflext> '+' 75 prctr. " 銷貨成本-差異
+
+  ENDIF.
+ENDFORM.
